@@ -1,0 +1,120 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background-image: url('landingpage.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 15px;
+  color: #2c3e50;
+}
+
+.formulario-container {
+  background-color: rgba(255, 255, 255, 0.96);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 100%;
+}
+
+.formulario-container h2 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: #2c3e50;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: none;
+  border-radius: 8px;
+  background-color: #ecf0f1;
+  font-size: 15px;
+  outline: none;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  display: block;
+  width: 100%;
+  max-width: 250px;
+  margin: 20px auto 0;
+  padding: 12px;
+  background-color: #2c3e50;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #1a252f;
+  transform: scale(1.03);
+}
+
+.volver {
+  display: block;
+  margin-top: 30px;
+  text-align: center;
+  color: #3498db;
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.volver:hover {
+  color: #216a94;
+}
+
+/* Mensaje de error estilizado */
+.alerta-error {
+  background-color: #fdecea;
+  color: #c0392b;
+  border-left: 6px solid #c0392b;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 600px) {
+  .formulario-container {
+    padding: 20px;
+  }
+
+  .formulario-container h2 {
+    font-size: 22px;
+  }
+
+  button {
+    font-size: 15px;
+  }
+}
