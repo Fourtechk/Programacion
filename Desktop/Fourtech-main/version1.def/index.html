@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Postulación Cooperativas</title>
+  <link rel="stylesheet" href="index.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <a href="index.html" class="logo">
+      <img src="WhatsApp Image 2025-07-28 at 7.31.15 PM.jpeg" alt="Logo Cooperativa">
+    </a>
+    <div class="top-bar">
+      <a href="login.html"><button class="login">Log In</button></a>
+      
+      <button class="menu-toggle">☰</button>
+    </div>
+  </header>
+
+  <nav class="side-menu" id="sideMenu">
+    <button class="close-menu" aria-label="Cerrar menú">✕</button>
+    <ul>
+      <li><a href="#">Inicio</a></li>
+      <li><a href="#">Sobre Nosotros</a></li>
+      <li><a href="#">Ayuda</a></li>
+      <li><a href="#">Contáctanos</a></li>
+      <li><a href="#">Información para Nuevos Socios</a></li>
+      <li><a href="#">Requisitos de Postulación</a></li>
+      <li><a href="#">Estado de Solicitud</a></li>
+      <li><a href="#">Preguntas Frecuentes</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <div class="form-wrapper">
+      <h2 class="titulo-principal">
+        ¿Quieres vivir <br><span>en alguna de nuestras cooperativas?</span>
+      </h2>
+      <div class="form-box">
+        <a href="postulacionInfo.html" class="btn-info">Información sobre postulación</a>
+        <a href="postularse.html"><button class="postularme">POSTULARME</button></a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const menuToggle = document.querySelector('.menu-toggle');
+    const sideMenu = document.getElementById('sideMenu');
+    const closeMenu = document.querySelector('.close-menu');
+
+    menuToggle.addEventListener('click', () => {
+      sideMenu.classList.add('show');
+    });
+
+    closeMenu.addEventListener('click', () => {
+      sideMenu.classList.remove('show');
+    });
+  </script>
+</body>
+</html>

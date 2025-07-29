@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="estilo.css">
+    <style>
+        body {
+            background-color: #dcdcdc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .login-container {
+            background-color: #7c7c7c;
+            padding: 2rem 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-container h2 {
+            text-align: center;
+            color: white;
+            font-size: 32px;
+            margin-bottom: 2rem;
+        }
+
+        label {
+            color: #f1f1f1;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background-color: #dcdcdc;
+            font-size: 16px;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background-color: #353535;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-login:hover {
+            background-color: #555;
+        }
+
+        .volver {
+            margin-top: 1rem;
+            display: block;
+            text-align: center;
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form action="#" method="post">
+            <label for="usuario">Usuario o Correo</label>
+            <input type="text" id="usuario" name="usuario" required>
+
+            <label for="clave">Contraseña</label>
+            <input type="password" id="clave" name="clave" required>
+
+            <button type="submit" class="btn-login">Ingresar</button>
+        </form>
+        <a class="volver" href="index.html">← Volver al inicio</a>
+    </div>
+</body>
+</html>
