@@ -1,5 +1,6 @@
 <?php
 session_start(); // ← CORREGIDO: activa la sesión antes de usar $_SESSION
+require_once "conexion.php";
 $conexion = new mysqli($host, $user, $pass, $db, $port);
 
 // Verificar si el usuario está logueado
@@ -192,8 +193,8 @@ $usuarios = $conexion->query("SELECT * FROM miembro");
 </head>
 <body>
   <header>
-      <img src="logo.jpeg" alt="Logo Cooperativa">
-    </a>
+      <img src="logo.jpeg" alt="Logo Cooperativa" class="logo">
+    
     <div class="top-bar"></div>
   </header>
   <h2>📋 Panel de Administración</h2>

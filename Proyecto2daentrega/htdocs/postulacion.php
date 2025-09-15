@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+require_once "conexion.php";
 $conexion = new mysqli($host, $user, $pass, $db, $port);
 
 if (!isset($_SESSION['id'])) {

@@ -1,4 +1,5 @@
 <?php
+require_once "conexion.php";
 $conexion = new mysqli($host, $user, $pass, $db, $port);
 $mensaje = "";
 
