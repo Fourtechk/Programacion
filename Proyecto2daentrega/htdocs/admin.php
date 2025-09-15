@@ -198,7 +198,7 @@ $usuarios = $conexion->query("SELECT * FROM miembro");
     </a>
      <div class="top-bar"></div>
   </header>
-  <h2>📋 Panel de Administración</h2>
+  <h2>Panel de Administración</h2>
   
   <table>
     <tr>

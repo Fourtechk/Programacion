@@ -77,7 +77,7 @@ body {
 
 /* HEADER */
 header {
-  background: linear-gradient(135deg, #2c3e50, #34495e);
+  background-color: rgba(44, 62, 80, 0.9);
   height: 60px;
   display: flex;
   align-items: center;
@@ -98,8 +98,12 @@ header .logo {
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
 }
 
+header .logo,
 header .logo:focus,
 header .logo:active,
 header .logo img,
@@ -109,12 +113,14 @@ header .logo img:active {
   border: none !important;
   box-shadow: none !important;
 }
-
 header .logo img {
   height: 50px;
   border-radius: 50%;
   object-fit: contain;
   filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.4));
+  pointer-events: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent
 }
 
 /* MAIN */
@@ -258,23 +264,13 @@ button:hover {
 </head>
 <body>
 <header>
-   <a class="logo">
-      <img src="logo.jpeg" alt="Logo Cooperativa">
-    </a>
+  <a href="#" class="logo">
+    <img src="logo.jpeg" alt="logo-cooperativa">
+  </a>
 </header>
 
 
   <h2>Gestión de Comprobantes</h2>
-
-  <form method="get" class="filter">
-    <label>Filtrar por estado:</label>
-    <select name="estado" onchange="this.form.submit()">
-      <option value="" <?= $estado===''?'selected':'' ?>>Todos</option>
-      <option <?= $estado==='Pendiente'?'selected':'' ?>>Pendiente</option>
-      <option <?= $estado==='Aprobado'?'selected':'' ?>>Aprobado</option>
-      <option <?= $estado==='Rechazado'?'selected':'' ?>>Rechazado</option>
-    </select>
-  </form>
 
   <table>
     <tr>

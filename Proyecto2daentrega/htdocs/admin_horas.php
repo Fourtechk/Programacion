@@ -118,6 +118,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding-top: 65px;
 }
  header {
       background-color: rgba(44, 62, 80, 0.9);
