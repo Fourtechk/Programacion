@@ -1,0 +1,1 @@
+en el xampp una vez dentro, buscas la opcion import o importar y pones el archivo .sql que esta en esta carpeta.

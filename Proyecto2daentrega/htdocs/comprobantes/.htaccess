@@ -1,0 +1,3 @@
+Options -ExecCGI
+AddType text/plain .php .phtml .phar .cgi .pl .asp .aspx
+php_flag engine off
