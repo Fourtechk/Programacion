@@ -99,7 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     h2 { margin: 0 0 16px; }
     input {
-      width: 100%; padding: 12px; margin: 8px 0;
+      width: 93%; padding: 12px; margin: 8px 0;
       border: none; border-radius: 8px;
     }
     button {
@@ -139,6 +139,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
       border-radius: 50%;
     }
+    .Volver{
+      top:10px;
+      text-decoration:none;
+      display:block;
+      position:relative;
+      color:white;
+    }
   </style>
 </head>
 <body>
@@ -160,6 +167,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <input type="email" name="email" placeholder="Correo electrónico" required />
       <input type="password" name="password" placeholder="Contraseña" required />
       <button type="submit">Ingresar</button>
+      <a class="Volver" href="landingpage.html">volver</a>
     </form>
   </div>
 </body>
