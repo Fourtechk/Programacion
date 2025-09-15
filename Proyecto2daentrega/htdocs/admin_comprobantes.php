@@ -133,12 +133,13 @@ main {
   margin: 0 auto;
 }
 
-h2 {
-  margin: 25px 0;
-  color: white;
-  text-align: center;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-}
+  h2 {
+      text-align: center;
+      font-size: 32px;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+      margin-bottom: 30px;
+  }
 
 /* FILTRO */
 form.filter {
@@ -257,8 +258,9 @@ button:hover {
 </head>
 <body>
 <header>
-    <img src="logo.jpeg" alt="Logo">
-  <span class="titulo-header">Panel Root - Gestión de Comprobantes</span>
+   <a class="logo">
+      <img src="logo.jpeg" alt="Logo Cooperativa">
+    </a>
 </header>
 
 

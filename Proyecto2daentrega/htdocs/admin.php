@@ -193,9 +193,10 @@ $usuarios = $conexion->query("SELECT * FROM miembro");
 </head>
 <body>
   <header>
-      <img src="logo.jpeg" alt="Logo Cooperativa" class="logo">
-    
-    <div class="top-bar"></div>
+      <a class="logo">
+      <img src="logo.jpeg" alt="Logo Cooperativa">
+    </a>
+     <div class="top-bar"></div>
   </header>
   <h2>📋 Panel de Administración</h2>
   

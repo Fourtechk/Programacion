@@ -124,11 +124,41 @@ $resultado = $conexion->query($sql);
       color: white;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
   }
+  header {
+      background-color: rgba(44, 62, 80, 0.9);
+      height: 60px;
+      width: 99.9%;
+      left:0px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      position: absolute;
+      top: 0px;
+
+      z-index: 10;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      padding: 5px 0;
+    }
+    .logo img {
+      height: 54px;
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
+      border-radius: 50%;
+    }
 </style>
 </head>
 <header>
-  <img src="logo.jpeg" alt="Logo">
-  <span class="titulo-header">Panel Root - Administrador de Postulaciones</span>  
+  <a class="logo">
+      <img src="logo.jpeg" alt="Logo Cooperativa">
+    </a>
+
 </header>
 <body>
 

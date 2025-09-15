@@ -111,32 +111,36 @@ body {
   background-size: cover;
   background-position: center;
   margin: 0;
-  padding: 0;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
-}
-header {
-  background-color: rgba(44,62,80,0.9);
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 20px;
-  font-weight: 600;
-}
-main {
   flex: 1;
   padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-h1 {
-  color: white;
-  margin-bottom: 20px;
-}
+ header {
+      background-color: rgba(44, 62, 80, 0.9);
+      height: 60px;
+      width: 99.9%;
+      left:0px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      position: absolute;
+      top: 0px;
+
+      z-index: 10;
+    }
+h2 {
+      text-align: center;
+      font-size: 32px;
+      color: white;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+      margin-bottom: 30px;
+  }
 table {
   width: 100%;
   max-width: 1000px;
@@ -206,7 +210,7 @@ button:hover {
   box-shadow: 0 6px 14px rgba(0,0,0,0.25);
   background: linear-gradient(to right, #000508ff, #000502ff);
 }
-.logo {
+ .logo {
       display: flex;
       align-items: center;
       height: 100%;
@@ -223,11 +227,11 @@ button:hover {
 </head>
 <body>
 <header>
-  <img src="logo.jpeg" alt="Logo">
-  <span class="titulo-header">Panel Root - Administrador de Horas</span>  
+      <a class="logo">
+      <img src="logo.jpeg" alt="Logo Cooperativa">
+    </a>
 </header>
-<main>
-  <h1>Gestión de Horas de Socios</h1>
+  <h2>Gestión de Horas de Socios</h2>
 
   <?php if (isset($_GET["msg"])): ?>
     <p style="background:#dff0d8;color:#3c763d;padding:10px;border-radius:8px;text-align:center;">
@@ -316,6 +320,5 @@ button:hover {
     <button type="submit" class="btn">Ver Pagos</button>
   </form>
   </div>
-</main>
 </body>
 </html>
