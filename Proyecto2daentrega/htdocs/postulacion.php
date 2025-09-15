@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$conexion = new mysqli("localhost", "root", "", "sistema", $port);
+$conexion = new mysqli($host, $user, $pass, $db, $port);
 
 if (!isset($_SESSION['id'])) {
     die("Error: Debes iniciar sesión para postularte.");
