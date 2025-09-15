@@ -1,5 +1,5 @@
 <?php
-$conexion = new mysqli("localhost", "root", "", "sistema");
+$conexion = new mysqli("localhost", "root", "", "sistema", $port);
 $mensaje = "";
 
 if ($conexion->connect_error) {

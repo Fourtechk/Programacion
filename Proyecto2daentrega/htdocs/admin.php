@@ -1,6 +1,6 @@
 <?php
 session_start(); // ← CORREGIDO: activa la sesión antes de usar $_SESSION
-$conexion = new mysqli("localhost", "root", "", "sistema");
+$conexion = new mysqli("localhost", "root", "", "sistema", $port);
 
 // Verificar si el usuario está logueado
 if (!isset($_SESSION['id'])) {

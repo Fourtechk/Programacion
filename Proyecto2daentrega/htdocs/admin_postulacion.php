@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$conexion = new mysqli("localhost", "root", "", "sistema");
+$conexion = new mysqli("localhost", "root", "", "sistema", $port);
 
 // Verificar si el usuario está logueado
 if (!isset($_SESSION['id'])) {
