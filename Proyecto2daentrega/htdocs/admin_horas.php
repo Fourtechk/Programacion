@@ -14,13 +14,13 @@ $id = intval($_SESSION['id']);
 $resultado = $conexion->query("SELECT admin FROM miembro WHERE id_miembro = $id");
 
 if (!$resultado || $resultado->num_rows === 0) {
-    header("Location: landingpage.html?error=usuario_no_encontrado");
+    header("Location: index.html?error=usuario_no_encontrado");
     exit;
 }
 
 $datos = $resultado->fetch_assoc();
 if (intval($datos['admin']) !== 1) {
-    header("Location: landingpage.html?error=no_admin");
+    header("Location: index.html?error=no_admin");
     exit;
 }
 
@@ -222,7 +222,10 @@ button:hover {
 </style>
 </head>
 <body>
-<header><a href="landingpage.html"><div class="logo"><img src="logo.jpeg" alt="Logo"></div></a>Panel Root - Administrador de Horas</header>
+<header>
+  <img src="logo.jpeg" alt="Logo">
+  <span class="titulo-header">Panel Root - Administrador de Horas</span>  
+</header>
 <main>
   <h1>Gestión de Horas de Socios</h1>
 
@@ -306,8 +309,8 @@ button:hover {
     <form action="admin_comprobantes.php" method="post">
       <button type="submit" class="btn">Comprobantes</button>
     </form>
-    <form action="admin_horas.php" method="post">
-      <button type="submit" class="btn">Administrar Horas</button>
+    <form action="admin_postulacion.php" method="post">
+      <button type="submit" class="btn">Administrar Posstulaciones</button>
     </form>
     <form action="pagos.php" method="get">
     <button type="submit" class="btn">Ver Pagos</button>

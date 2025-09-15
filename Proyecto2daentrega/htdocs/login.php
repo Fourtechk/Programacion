@@ -167,7 +167,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <input type="email" name="email" placeholder="Correo electrónico" required />
       <input type="password" name="password" placeholder="Contraseña" required />
       <button type="submit">Ingresar</button>
-      <a class="Volver" href="landingpage.html">volver</a>
+      <a class="Volver" href="index.html">volver</a>
     </form>
   </div>
 </body>

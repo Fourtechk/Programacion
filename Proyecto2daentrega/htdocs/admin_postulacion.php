@@ -14,18 +14,17 @@ $id = intval($_SESSION['id']);
 $resultado = $conexion->query("SELECT admin FROM miembro WHERE id_miembro = $id");
 
 if (!$resultado || $resultado->num_rows === 0) {
-    header("Location: landingpage.html?error=usuario_no_encontrado");
+    header("Location: index.html?error=usuario_no_encontrado");
     exit;
 }
 
 $datos = $resultado->fetch_assoc();
 if (intval($datos['admin']) !== 1) {
-    header("Location: landingpage.html?error=no_admin");
+    header("Location: index.html?error=no_admin");
     exit;
 }
 
-// Conexión a la base de datos
-$conexion = new mysqli("localhost", "root", "", "sistema");
+
 if ($conexion->connect_error) {
     die("Error de conexión: " . $conexion->connect_error);
 }
@@ -127,6 +126,10 @@ $resultado = $conexion->query($sql);
   }
 </style>
 </head>
+<header>
+  <img src="logo.jpeg" alt="Logo">
+  <span class="titulo-header">Panel Root - Administrador de Postulaciones</span>  
+</header>
 <body>
 
 <h2>Listado de Postulaciones</h2>

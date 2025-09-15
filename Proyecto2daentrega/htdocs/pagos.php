@@ -262,7 +262,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
 </head>
 <body>
   <header>
-    <a href="landingpage.html" class="logo"><img src="logo.jpeg" alt="Logo"></a>
     <div class="top-bar">
       <a href="logout.php">Cerrar sesión</a>
     </div>
@@ -393,9 +392,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
         <?php else: ?>
           <p><em>No hay registros aún.</em></p>
         <?php endif; ?>
-      </div> <!-- fin .form-box (Mis Horas) -->
+      </div> 
 
-    </div> <!-- fin .form-wrapper -->
+    </div> 
 
     
 

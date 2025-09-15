@@ -117,7 +117,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
   <header>
-    <a href="landingpage.html" class="logo">
       <img src="logo.jpeg" alt="Logo Cooperativa">
     </a>
     
@@ -136,7 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           <input type="email" name="email" placeholder="Email" required>
           <input type="password" name="password" placeholder="Contraseña" required>
           <button type="submit" class="btn">Registrarse</button> 
-          <a class="volver" href="landingpage.html">volver</a>
+          <a class="volver" href="index.html">volver</a>
             </form>
       </div>
     </div>

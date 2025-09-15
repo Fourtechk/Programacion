@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
     );
 
     if ($stmt->execute()) {
-    header("Location: landingpage.html?mensaje=ok");
+    header("Location: index.html?mensaje=ok");
     exit;
 }
 
@@ -192,7 +192,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
 <body>
 
   <header>
-    <a href="landingpage.html" class="logo">
       <img src="logo.jpeg" alt="Logo Cooperativa">
     </a>
   </header>
