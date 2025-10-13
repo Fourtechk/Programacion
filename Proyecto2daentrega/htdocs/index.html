@@ -3,94 +3,163 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cooperativas</title>
+  <title>Cooperativas de Vivienda</title>
   <link rel="stylesheet" href="landingpage.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  
-  
-  <header>
-    <a class="logo">
+
+<header id="mainHeader">
+  <div class="header-content">
+    <div class="logo">
       <img src="logo.jpeg" alt="Logo Cooperativa">
-    </a>
-    <div class="top-bar">
-      
-      <button class="menu-toggle">☰</button>
     </div>
-  </header>
 
-  <nav class="side-menu" id="sideMenu">
-    <button class="close-menu" aria-label="Cerrar menú">✕</button>
-    <ul>
-      <li><a href="#">Inicio</a></li>
-      <li><a href="#">Informacion Sobre Nosotros</a></li>
-      <li><a href="#">Contacto</a></li>
-      <li><a href="login.php">Iniciar Sesion</a></li>
-      <li><a href="registro.php">Registrarme</a></li>
-    </ul>
-  </nav>
- <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const params = new URLSearchParams(window.location.search);
+    <nav class="menu">
+      <a href="#inicio">Inicio</a>
+      <a href="#nosotros">Sobre Nosotros</a>
+    </nav>
 
-    if (params.get("mensaje") === "ok") {
-      const mensaje = document.createElement("p");
-      mensaje.textContent = "✅ Tu postulación fue enviada correctamente.";
-      mensaje.style.background = "#ecf0f1";
-      mensaje.style.color = "#2c3e50";
-      mensaje.style.padding = "12px";
-      mensaje.style.borderRadius = "10px";
-      mensaje.style.fontWeight = "600";
-      mensaje.style.textAlign = "center";
-      mensaje.style.margin = "20px auto";
-      mensaje.style.maxWidth = "600px";
-      document.querySelector("header").insertAdjacentElement("afterend", mensaje);
+    <!-- Botón hamburguesa (top-right) -->
+    <div class="menu-toggle" id="menuToggle" aria-expanded="false" aria-label="Abrir menú">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
 
-    }
+    <!-- Desplegable en la esquina derecha -->
+    <div class="dropdown" id="headerDropdown" aria-hidden="true">
+      <a class="dropdown-link" href="#inicio">Inicio</a>
+      <a class="dropdown-link" href="#nosotros">Sobre Nosotros</a>
+      <a class="dropdown-link" href="registro.php">Postularme</a>
+      <a class="dropdown-link" href="login.php">Iniciar sesión</a>
+    </div>
+  </div>
+</header>
 
-    if (params.get("error") === "no_admin") {
-      const mensaje = document.createElement("p");
-      mensaje.textContent = "⚠️ No tienes permisos para acceder al panel de administración.";
-      mensaje.style.background = "#f8d7da";
-      mensaje.style.color = "#721c24";
-      mensaje.style.padding = "12px";
-      mensaje.style.borderRadius = "10px";
-      mensaje.style.fontWeight = "600";
-      mensaje.style.textAlign = "center";
-      mensaje.style.margin = "20px auto";
-      mensaje.style.maxWidth = "600px";
-      
-      document.querySelector("header").insertAdjacentElement("afterend", mensaje);
+<!-- Mensajes dinámicos -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const params = new URLSearchParams(window.location.search);
 
-    }
-  });
+  if (params.get("mensaje") === "ok") {
+    const mensaje = document.createElement("p");
+    mensaje.textContent = "✅ Tu postulación fue enviada correctamente.";
+    mensaje.style.background = "#ecf0f1";
+    mensaje.style.color = "#2c3e50";
+    mensaje.style.padding = "12px";
+    mensaje.style.borderRadius = "10px";
+    mensaje.style.fontWeight = "600";
+    mensaje.style.textAlign = "center";
+    mensaje.style.margin = "20px auto";
+    mensaje.style.maxWidth = "600px";
+    document.querySelector("header").insertAdjacentElement("afterend", mensaje);
+  }
+
+  if (params.get("error") === "no_admin") {
+    const mensaje = document.createElement("p");
+    mensaje.textContent = "⚠️ No tienes permisos para acceder al panel de administración.";
+    mensaje.style.background = "#f8d7da";
+    mensaje.style.color = "#721c24";
+    mensaje.style.padding = "12px";
+    mensaje.style.borderRadius = "10px";
+    mensaje.style.fontWeight = "600";
+    mensaje.style.textAlign = "center";
+    mensaje.style.margin = "20px auto";
+    mensaje.style.maxWidth = "600px";
+    document.querySelector("header").insertAdjacentElement("afterend", mensaje);
+  }
+});
 </script>
 
-  <main>
-    <div class="form-wrapper">
-      <h2 class="titulo-principal">
-        ¿Quieres vivir <br><span>en alguna de nuestras cooperativas?</span>
-      </h2>
-      <div class="form-box">
-        <a href="login.php" class="btn-info">Ya soy miembro</a>
-        <a href="registro.php"><button class="postularme">REGISTRARME</button></a>
-      </div>
+<!-- INICIO -->
+<section id="inicio" class="section inicio">
+  <div class="background-image"></div>
+  <div class="form-wrapper">
+    <h2 class="titulo-principal">
+      ¿Quieres vivir <br><span>en alguna de nuestras cooperativas?</span>
+    </h2>
+    <div class="form-box">
+      <a href="registro.php"><button class="postularme">POSTULARME</button></a>
+      <a href="login.php"><button class="iniciar-sesion">INICIAR SESIÓN</button></a>
     </div>
-  </main>
+  </div>
+</section>
 
-  <script>
-    const menuToggle = document.querySelector('.menu-toggle');
-    const sideMenu = document.getElementById('sideMenu');
-    const closeMenu = document.querySelector('.close-menu');
+<!-- SOBRE NOSOTROS -->
+<section id="nosotros" class="section sobre">
+  <h2>Sobre Nosotros</h2>
+  <p>
+    Somos una organización dedicada a promover la vivienda digna a través del sistema de ayuda mutua. 
+    Nuestro objetivo es brindar a las familias la oportunidad de construir su propio hogar, 
+    fomentando la solidaridad, la transparencia y la cooperación.
+  </p>
+</section>
 
-    menuToggle.addEventListener('click', () => {
-      sideMenu.classList.add('show');
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 Cooperativas de Vivienda | Todos los derechos reservados |
+  <span>📧 info@cooperativas.com</span> | <span>📞 +598 123 456 78</span></p>
+</footer>
+
+<script>
+  // Fondo del header al hacer scroll
+  window.addEventListener("scroll", () => {
+    const header = document.getElementById("mainHeader");
+    header.classList.toggle("scrolled", window.scrollY > 60);
+  });
+
+  // Desplazamiento suave
+  document.querySelectorAll('a[href^="#"]').forEach(enlace => {
+    enlace.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+
+      const menuToggle = document.getElementById('menuToggle');
+      const dropdown = document.getElementById('headerDropdown');
+      if (menuToggle.classList.contains('open')) {
+        menuToggle.classList.remove('open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        dropdown.classList.remove('active');
+        dropdown.setAttribute('aria-hidden', 'true');
+      }
     });
+  });
 
-    closeMenu.addEventListener('click', () => {
-      sideMenu.classList.remove('show');
+  // Control del menú hamburguesa
+  const menuToggle = document.getElementById('menuToggle');
+  const dropdown = document.getElementById('headerDropdown');
+
+  menuToggle.addEventListener('click', () => {
+    const isOpen = menuToggle.classList.toggle('open');
+    dropdown.classList.toggle('active', isOpen);
+    menuToggle.setAttribute('aria-expanded', String(isOpen));
+    dropdown.setAttribute('aria-hidden', String(!isOpen));
+  });
+
+  // cerrar dropdown al clickear fuera
+  document.addEventListener('click', (e) => {
+    const isClickInside = e.target.closest('.header-content');
+    if (!isClickInside && dropdown.classList.contains('active')) {
+      dropdown.classList.remove('active');
+      menuToggle.classList.remove('open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      dropdown.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  // Animación al hacer scroll para secciones
+  const sections = document.querySelectorAll('.section');
+  const showSection = () => {
+    const triggerBottom = window.innerHeight * 0.85;
+    sections.forEach(section => {
+      const sectionTop = section.getBoundingClientRect().top;
+      if(sectionTop < triggerBottom) section.classList.add('show');
     });
-  </script>
+  };
+  window.addEventListener('scroll', showSection);
+  window.addEventListener('load', showSection);
+</script>
+
 </body>
 </html>
