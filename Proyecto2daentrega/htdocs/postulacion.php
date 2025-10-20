@@ -3,14 +3,10 @@ session_start();
 require_once "conexion.php";
 $conexion = new mysqli($host, $user, $pass, $db, $port);
 
-if (!isset($_SESSION['id'])) {
-    die("Error: Debes iniciar sesión para postularte.");
-}
-
-$mensaje = "";
-$id_miembro = intval($_SESSION['id']);
-
 if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
+    $nombre = $_POST["nombre"];
+    $email = $_POST["email"];
+    $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
     $cantidad_menores = intval($_POST["cantidad_menores"] ?? 0);
     $trabajo = $_POST["trabajo"] ?? '';
     $tipo_contrato = $_POST["tipo_contrato"] ?? '';
@@ -18,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
     $ingresos_familiares = floatval($_POST["ingresos_familiares"] ?? 0);
     $observacion_salud = $_POST["observacion_salud"] ?? '';
     $constitucion_familiar = $_POST["constitucion_familiar"] ?? '';
-    $vivienda_actual = $_POST["vivienda_actual"] ?? '';
+    $vivienda_actual = $_POST["vivienda_actual"] ?? '';     
     $gasto_vivienda = floatval($_POST["gasto_vivienda"] ?? 0);
     $nivel_educativo = $_POST["nivel_educativo"] ?? '';
     $hijos_estudiando = intval($_POST["hijos_estudiando"] ?? 0);
@@ -27,26 +23,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
     $motivacion = $_POST["motivacion"] ?? '';
     $presentado_por = $_POST["presentado_por"] ?? '';
     $referencia_contacto = $_POST["referencia_contacto"] ?? '';
-
+ 
     $stmt = $conexion->prepare("INSERT INTO postulacion (
-        id_miembro, cantidad_menores, trabajo, tipo_contrato, ingresos_nominales, ingresos_familiares,
+        id_miembro, nombre, email, password, cantidad_menores, trabajo, tipo_contrato, ingresos_nominales, ingresos_familiares,
         observacion_salud, constitucion_familiar, vivienda_actual, gasto_vivienda, nivel_educativo,
         hijos_estudiando, patrimonio, disponibilidad_ayuda, motivacion, presentado_por, referencia_contacto,
         estado_po
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente')");
 
     $stmt->bind_param("iissddsssssisssss",
-        $id_miembro, $cantidad_menores, $trabajo, $tipo_contrato, $ingresos_nominales, $ingresos_familiares,
+        $id_miembro, $nombre, $email, $password, $cantidad_menores, $trabajo, $tipo_contrato, $ingresos_nominales, $ingresos_familiares,
         $observacion_salud, $constitucion_familiar, $vivienda_actual, $gasto_vivienda, $nivel_educativo,
         $hijos_estudiando, $patrimonio, $disponibilidad_ayuda, $motivacion, $presentado_por, $referencia_contacto
     );
 
     if ($stmt->execute()) {
-    header("Location: index.html?mensaje=ok");
-    exit;
-}
-
-
+        header("Location: index.html?mensaje=ok");
+        exit;
+    }
 
     $stmt->close();
 }
@@ -59,6 +53,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
   <title>Formulario de Postulación</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
     * {
       margin: 0;
       padding: 0;
@@ -67,118 +63,163 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
     }
 
     body {
-      background-image: url('landingpage.jpg');
-      background-size: cover;
-      background-position: center;
+      background: linear-gradient(135deg, #1a2433 0%, #2b5f87 100%);
+      color: #f1f5f9;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      color: #333;
     }
 
     header {
-      background-color: rgba(44, 62, 80, 0.9);
-      height: 60px;
+      background: rgba(26, 36, 51, 0.85);
+      backdrop-filter: blur(8px);
+      height: 64px;
       display: flex;
       align-items: center;
+      justify-content: start;
       padding: 0 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     }
 
     header img {
       height: 54px;
       border-radius: 50%;
+      object-fit: cover;
+      filter: drop-shadow(0 0 4px rgba(255,255,255,0.15));
     }
 
     main {
       flex: 1;
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 30px 15px;
-      text-align: center;
+      align-items: flex-start;
+      padding: 40px 15px;
     }
 
     .form-wrapper {
-      text-align: center;
-      max-width: 700px;
-      margin: 0 auto;
-      color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+      width: 100%;
+      max-width: 800px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      backdrop-filter: blur(12px);
+      color: #ffffff;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .titulo-principal {
       font-size: 28px;
-      margin-bottom: 15px;
-      color: white;
+      text-align: center;
+      margin-bottom: 24px;
+      font-weight: 600;
+      color: #ffffff;
     }
 
     .titulo-principal span {
-      color: #a2d4ff;
-      font-weight: 600;
+      color: #6ebbe9;
     }
 
     .btn-info {
       display: block;
-      background-color: #ecf0f1;
+      text-align: center;
+      background: rgba(110, 187, 233, 0.2);
       padding: 12px;
       border-radius: 10px;
-      color: #2c3e50;
+      color: #e0f2ff;
       font-weight: 600;
       margin-bottom: 25px;
     }
 
     .form-box {
-      background-color: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255,255,255,0.1);
       padding: 30px;
       border-radius: 16px;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      color: #2c3e50;
-      text-align: left;
+      color: #f1f5f9;
     }
 
     form label {
-      font-weight: 600;
+      font-weight: 500;
       display: block;
       margin-top: 15px;
       margin-bottom: 5px;
+      color: #dbeafe;
     }
 
     form input,
     form select,
     form textarea {
       width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.1);
+      color: #fff;
       font-size: 14px;
+      outline: none;
+      transition: 0.3s ease;
+    }
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+      border-color: #6ebbe9;
+      background: rgba(255,255,255,0.15);
+      box-shadow: 0 0 0 3px rgba(110,187,233,0.3);
     }
 
     form textarea {
       resize: vertical;
-      min-height: 60px;
+      min-height: 70px;
     }
 
     .postularme {
-      background-color: #2c3e50;
+      background: linear-gradient(135deg, #6ebbe9, #2b5f87);
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 14px;
       border-radius: 10px;
       cursor: pointer;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
       margin-top: 20px;
       width: 100%;
-      transition: 0.3s;
+      transition: 0.3s ease;
     }
 
     .postularme:hover {
-      background-color: #1a252f;
+      background: linear-gradient(135deg, #2b5f87, #6ebbe9);
       transform: scale(1.03);
+      box-shadow: 0 4px 16px rgba(110, 187, 233, 0.4);
     }
 
-    @media (max-width: 600px) {
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      color: #edf1f6;
+      text-decoration: none;
+      font-weight: 500;
+      text-align: center;
+      width: 100%;
+      transition: color 0.3s;
+    }
+
+    a:hover {
+      color: #6ebbe9;
+    }
+
+    @media (max-width: 700px) {
+      .form-wrapper {
+        padding: 20px;
+      }
+
       .titulo-principal {
         font-size: 22px;
       }
@@ -192,20 +233,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
 <body>
 
   <header>
-      <img src="logo.jpeg" alt="Logo Cooperativa">
-    </a>
+      <img src="logo.jpeg" alt="Logo Cooperativa"> 
   </header>
 
   <main>
     <div class="form-wrapper">
-      <h2 class="titulo-principal">Formulario de <span>Postulación</span></h2>
-
-      <?php if($mensaje !== ""): ?>
-        <p class="btn-info"><?= htmlspecialchars($mensaje) ?></p>
-      <?php endif; ?>
+      <h2 class="titulo-principal">Formulario de <span>Postulación</span></h2>   
 
       <div class="form-box">
         <form method="POST">
+          <label>Nombre Completo</label>
+          <input type="text" name="nombre">
+          
+          <label>Email</label>
+          <input type="email" name="email">
+
+          <label>Contraseña</label>
+          <input type="password" name="password">
+
           <label>Cantidad de menores a cargo:</label>
           <input type="number" name="cantidad_menores" required>
 
@@ -258,10 +303,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
           <label>Referencia personal (nombre y teléfono):</label>
           <input type="text" name="referencia_contacto">
 
+          
+
           <button type="submit" class="postularme">Enviar Postulación</button>
+          
         </form>
 
-        <a href="landingpage.html">Volver</a>
+        <a href="index.html">Volver</a>
       </div>
     </div>
   </main>

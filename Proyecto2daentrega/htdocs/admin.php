@@ -205,10 +205,8 @@ $usuarios = $conexion->query("SELECT * FROM miembro");
       <th>ID</th>
       <th>Nombre</th>
       <th>Email</th>
-      <th>Aprobado</th>
       <th>Miembro</th>
       <th>Admin</th>
-      <th>Acciones</th>
       <th>Postulación</th>
     </tr>
     <?php while($u = $usuarios->fetch_assoc()): ?>
@@ -216,8 +214,12 @@ $usuarios = $conexion->query("SELECT * FROM miembro");
       <td><?= $u["id_miembro"] ?></td>
       <td><?= $u["nombre"] ?></td>
       <td><?= $u["email"] ?></td>
-      <td><?= $u["aprobado"] ? "✅ Sí" : "❌ No" ?></td>
-      <td><?= $u["es_miembro"] ? "✅ Sí" : "❌ No" ?></td>
+      <td><?= $u["es_miembro"] ? "✅ Sí" : "❌ No" ?> <br>
+      <?php if ($u["es_miembro"]): ?>
+          <a class="rojo" href="?id=<?= $u["id_miembro"] ?>&socio=0">Quitar miembro</a>
+        <?php else: ?>
+          <a class="azul" href="?id=<?= $u["id_miembro"] ?>&socio=1">Hacer miembro</a>
+        <?php endif; ?></td>
       <td>
         <?= $u["admin"] ? "✅ Sí" : "❌ No" ?><br>
         <?php if ($u["admin"]): ?>
@@ -226,17 +228,7 @@ $usuarios = $conexion->query("SELECT * FROM miembro");
           <a class="azul" href="?id=<?= $u["id_miembro"] ?>&admin=1">Hacer admin</a>
         <?php endif; ?>
       </td>
-      <td>
-        <?php if (!$u["aprobado"]): ?>
-          <a class="verde" href="?aprobar=<?= $u["id_miembro"] ?>">Aprobar</a>
-        <?php endif; ?>
-
-        <?php if ($u["es_miembro"]): ?>
-          <a class="rojo" href="?id=<?= $u["id_miembro"] ?>&socio=0">Quitar miembro</a>
-        <?php else: ?>
-          <a class="azul" href="?id=<?= $u["id_miembro"] ?>&socio=1">Hacer miembro</a>
-        <?php endif; ?>
-      </td>
+     
       <td>
         <?php
         $id_miembro = $u["id_miembro"];

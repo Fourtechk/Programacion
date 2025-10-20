@@ -144,121 +144,127 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Pagos y Horas - Cooperativa</title>
   <link rel="stylesheet" href="landingpage.css">
-  <style>
-    body {
-      background: url('landingpage.jpg') center/cover fixed;
-      font-family: "Poppins", sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #2c3e50;
-    }
-    header {
-      background: rgba(44,62,80,0.9);
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    }
-    header .logo img {
-      height: 50px;
-      border-radius: 50%;
-    }
-    header .top-bar a {
-      background: #c0392b;
-      color: white;
-      padding: 8px 14px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    main {
-      max-width: 1100px;
-      margin: 30px auto;
-      padding: 0 20px;
-    }
-    .titulo-principal {
-      text-align: center;
-      color: white;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
-      margin-bottom: 30px;
-    }
-    .form-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-    .form-box {
-      background: rgba(255,255,255,0.95);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-    }
-    .form-box h2, .form-box h3 {
-      margin-top: 0;
-      color: #34495e;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 8px;
-    }
-    input[type="number"], input[type="text"], input[type="file"], textarea, select {
-      width: 100%;
-      padding: 8px;
-      margin: 6px 0 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-family: inherit;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background: #34495e;
-      color: white;
-    }
-    .postularme {
-      background: linear-gradient(135deg, #27ae60, #219150);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s ease;
-    }
-    .postularme:hover {
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
-    }
-    ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    ul li {
-      padding: 6px 0;
-      border-bottom: 1px solid #eee;
-    }
-    ul li:last-child {
-      border-bottom: none;
-    }
-    em {
-      color: #7f8c8d;
-    }
-  </style>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2433, #2b5f87);
+            color: #edf1f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #6ebbe9;
+            text-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
+        }
+
+        .tabla-contenedor {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        thead {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: center;
+        }
+
+        th {
+            color: #6ebbe9;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        tr {
+            transition: background 0.3s ease;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        td {
+            color: #edf1f6;
+            font-weight: 300;
+        }
+
+        .boton-volver {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 10px 22px;
+            background-color: #6ebbe9;
+            color: #1a2433;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(110, 187, 233, 0.4);
+        }
+
+        .boton-volver:hover {
+            background-color: #2b5f87;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(110, 187, 233, 0.6);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .tabla-contenedor {
+                padding: 10px;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
   <header>

@@ -60,7 +60,6 @@ CREATE TABLE `miembro` (
   `nombre` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `aprobado` tinyint(1) DEFAULT 0,
   `es_miembro` tinyint(1) DEFAULT 0,
   `admin` tinyint(1) DEFAULT 0,
   `estado` varchar(100) DEFAULT NULL,
@@ -72,14 +71,14 @@ CREATE TABLE `miembro` (
 -- Volcado de datos para la tabla `miembro`
 --
 
-INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `aprobado`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`) VALUES
-(1, 'Tomas', 'tomas@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 1, 'pendiente', NULL, NULL),
-(2, 'Admin General', 'admin@coop.com', '$2y$10$KjS5Epbjs5SduXUqTflNOek5rDn6Xnv5OGAzpWw/szXmtgLOgRzXy', 1, 0, 0, 'aprobado', NULL, NULL),
-(3, 'CuloCon', 'culo@gmail.com', '$2y$10$l.osSp1Yx8OVshXJJNToZOf6NaKDD1bh/pWiXwDGE3OSoaqpKuJMC', 1, 1, 0, NULL, NULL, NULL),
-(4, 'Alberto', 'alberto@gmail.com', '$2y$10$SAJ/SBaKZU7G4ePeRny7ae9mrkbs/OggUtTofZEFiLLlgZKpAk2lW', 1, 0, 0, NULL, NULL, NULL),
-(5, 'caca', 'caca@gmail.com', '$2y$10$oLbDloLqX1YhJ1zRM1IJBuhK2q86EO.vrFxD4ymaa5ZuLIt7iK1Iu', 1, 0, 0, NULL, NULL, NULL),
-(6, 'Santino', 'santi@gmail.com', '$2y$10$1M/CMVSKhsyWn4wVGmj8meVR/JTQXZHEV826yVDNJm9JUMXzenAiW', 1, 0, 0, NULL, NULL, NULL),
-(7, 'Admin', 'admin@cooperativa.com', '$2y$10$GYi1Y560hitzs8MVotsWgetP9EOjsXD6Fe/C5vdwBjLWHhjILXIgC', 1, 1, 1, NULL, NULL, NULL);
+INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`) VALUES
+(1, 'Tomas', 'tomas@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 'pendiente', NULL, NULL),
+(2, 'Admin General', 'admin@coop.com', '$2y$10$KjS5Epbjs5SduXUqTflNOek5rDn6Xnv5OGAzpWw/szXmtgLOgRzXy', 0, 0, 'aprobado', NULL, NULL),
+(3, 'CuloCon', 'culo@gmail.com', '$2y$10$l.osSp1Yx8OVshXJJNToZOf6NaKDD1bh/pWiXwDGE3OSoaqpKuJMC', 1, 0, NULL, NULL, NULL),
+(4, 'Alberto', 'alberto@gmail.com', '$2y$10$SAJ/SBaKZU7G4ePeRny7ae9mrkbs/OggUtTofZEFiLLlgZKpAk2lW', 0, 0, NULL, NULL, NULL),
+(5, 'caca', 'caca@gmail.com', '$2y$10$oLbDloLqX1YhJ1zRM1IJBuhK2q86EO.vrFxD4ymaa5ZuLIt7iK1Iu', 0, 0, NULL, NULL, NULL),
+(6, 'Santino', 'santi@gmail.com', '$2y$10$1M/CMVSKhsyWn4wVGmj8meVR/JTQXZHEV826yVDNJm9JUMXzenAiW', 0, 0, NULL, NULL, NULL),
+(7, 'Admin', 'admin@cooperativa.com', '$2y$10$GYi1Y560hitzs8MVotsWgetP9EOjsXD6Fe/C5vdwBjLWHhjILXIgC', 1, 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -113,6 +112,9 @@ INSERT INTO `pago` (`id_pago`, `monto`, `concepto`, `estado_pa`, `fecha_p`, `com
 --
 
 CREATE TABLE `postulacion` (
+  `nombre` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `id_postulacion` int(11) NOT NULL,
   `fecha_po` date DEFAULT NULL,
   `estado_po` enum('pendiente','aceptada','rechazada') DEFAULT 'pendiente',
