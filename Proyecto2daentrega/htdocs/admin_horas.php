@@ -383,7 +383,7 @@ button:hover {
       <button type="submit" class="btn">Comprobantes</button>
     </form>
     <form action="admin_postulacion.php" method="post">
-      <button type="submit" class="btn">Administrar Posstulaciones</button>
+      <button type="submit" class="btn">Administrar Postulaciones</button>
     </form>
     <form action="pagos.php" method="get">
     <button type="submit" class="btn">Ver Pagos</button>
