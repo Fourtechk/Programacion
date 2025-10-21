@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
     );
 
     if ($stmt->execute()) {
-        $mensaje = "Tu registro y postulación fueron enviados correctamente. ¡Ya sos miembro!";
+        $mensaje = "Tu postulacion fue enviada con éxito, gracias por confiar en nosotros.";
     } else {
         $mensaje = "Error al guardar la postulación: " . $stmt->error;
     }
@@ -281,9 +281,50 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
         <input type="text" name="referencia_contacto">
                 
         <button type="submit" class="postularme">Enviar Postulación</button> </form>
-                <a href="index.html">Volver</a>
+               <a href="index.html">Volver</a>
       </div>
    </div>
 </main> 
+
+<?php if (!empty($mensaje)): ?>
+<div id="toast" class="toast"><?php echo htmlspecialchars($mensaje); ?></div>
+<script>
+  const toast = document.getElementById("toast");
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    window.location.href = "index.html";
+  }, 1500);
+</script>
+
+<style>
+.toast {
+  visibility: hidden;
+  min-width: 320px;
+  background: linear-gradient(135deg, #2b5f87, #6ebbe9);
+  color: #fff;
+  text-align: center;
+  border-radius: 12px;
+  padding: 14px 20px;
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  font-weight: 600;
+  font-size: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  opacity: 0;
+  transition: top 0.4s ease, opacity 0.4s ease;
+}
+.toast.show {
+  visibility: visible;
+  top: 25px;
+  opacity: 1;
+}
+</style>
+<?php endif; ?>
+
+
 </body> 
 </html>
