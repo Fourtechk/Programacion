@@ -53,98 +53,147 @@ $usuarios = $conexion->query("SELECT * FROM miembro");
 <head>
   <meta charset="UTF-8">
   <title>Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      background-image: url('landingpage.jpg');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      font-family: "Poppins", sans-serif;
-      padding: 20px;
+    /* ======== ESTILO GENERAL ======== */
+    * {
+      box-sizing: border-box;
       margin: 0;
-      color: #2c3e50;
+      padding: 0;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a2433, #2b5f87);
+      background-attachment: fixed;
+      color: #edf1f6;
+      padding: 90px 20px 40px;
+      min-height: 100vh;
+    }
+
+    header {
+      background: rgba(26, 36, 51, 0.9);
+      backdrop-filter: blur(10px);
+      height: 70px;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .logo img {
+      height: 50px;
+      width: auto;
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
     }
 
     h2 {
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
       text-align: center;
       margin: 40px 0 30px;
-      color: #ffffff;
-      font-size: 36px;
-      font-weight: bold;
+      font-weight: 600;
+      color: #6ebbe9;
+      text-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
       letter-spacing: 1px;
+      font-size: 34px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      background: rgba(255,255,255,0.95);
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
       margin-bottom: 40px;
+      animation: fadeIn 0.8s ease-in-out;
     }
 
     th, td {
       padding: 14px;
       text-align: center;
+      color: #edf1f6;
     }
 
     th {
-      background: linear-gradient(135deg, #34495e, #2c3e50);
-      color: white;
-      font-size: 16px;
+      background: rgba(110, 187, 233, 0.15);
+      color: #6ebbe9;
+      font-size: 15px;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
-    tr:nth-child(even) { background: #f4f6f7; }
-    tr:nth-child(odd) { background: #ffffff; }
+    tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    tr:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transition: background 0.3s ease;
+    }
 
     td {
       font-size: 15px;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     a {
       display: inline-block;
       padding: 8px 14px;
-      border-radius: 8px;
+      border-radius: 10px;
       text-decoration: none;
       font-size: 14px;
-      font-weight: bold;
-      color: white;
-      transition: 0.3s ease;
+      font-weight: 500;
+      color: #fff;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
     }
 
     a.verde { background: #27ae60; }
-    a.verde:hover { background: #2ecc71; }
+    a.verde:hover { background: #2ecc71; box-shadow: 0 0 12px rgba(46, 204, 113, 0.4); }
 
     a.azul { background: #2980b9; }
-    a.azul:hover { background: #3498db; }
+    a.azul:hover { background: #3498db; box-shadow: 0 0 12px rgba(52, 152, 219, 0.4); }
 
     a.rojo { background: #c0392b; }
-    a.rojo:hover { background: #e74c3c; }
+    a.rojo:hover { background: #e74c3c; box-shadow: 0 0 12px rgba(231, 76, 60, 0.4); }
 
     a.gris { background: #7f8c8d; }
-    a.gris:hover { background: #95a5a6; }
+    a.gris:hover { background: #95a5a6; box-shadow: 0 0 12px rgba(149, 165, 166, 0.4); }
 
     .btn {
       padding: 12px 24px;
-      background-color: #34495e;
-      color: white;
+      background-color: #6ebbe9;
+      color: #1a2433;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 600;
       cursor: pointer;
       font-size: 16px;
-      transition: background-color 0.3s, transform 0.2s;
+      transition: all 0.3s ease;
       margin-top: 20px;
       margin-right: 20px;
+      box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
     }
 
     .btn:hover {
-      background-color: #2c3e50;
+      background-color: #2b5f87;
+      color: #fff;
+      box-shadow: 0 0 14px rgba(110, 187, 233, 0.5);
       transform: translateY(-2px);
     }
 
@@ -152,45 +201,41 @@ $usuarios = $conexion->query("SELECT * FROM miembro");
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 30px;
+      margin-top: 40px;
     }
 
     p {
       text-align: center;
       font-size: 16px;
-      color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      color: #edf1f6;
+      opacity: 0.9;
+      margin-top: 10px;
     }
-    header {
-      background-color: rgba(44, 62, 80, 0.9);
-      height: 60px;
-      width: 99.9%;
-      left:0px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      position: absolute;
-      top: 0px;
 
-      z-index: 10;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .logo {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      padding: 5px 0;
-    }
-    .logo img {
-      height: 54px;
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
-      border-radius: 50%;
+
+    @media (max-width: 768px) {
+      h2 { font-size: 28px; }
+      table { font-size: 14px; }
+      th, td { padding: 10px; }
+      .btn { font-size: 14px; margin: 10px; }
     }
   </style>
 </head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="logo.png" alt="Logo">
+    </div>
+  </header>
+
+  
+</body>
+</html>
+
 <body>
   <header>
       <a class="logo">

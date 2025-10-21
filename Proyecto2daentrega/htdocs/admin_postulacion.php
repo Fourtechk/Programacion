@@ -43,116 +43,150 @@ $resultado = $conexion->query($sql);
 <meta charset="UTF-8">
 <title>Administrar Postulaciones</title>
 <style>
-  /* Estilo general */
-  body {
-      font-family: 'Arial', sans-serif;
-      background-image: url('landingpage.jpg');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      margin: 0;
-      padding: 40px;
-      color: #2c3e50;
-  }
+/* ESTILO GENERAL */
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #0a2239, #1e3d58);
+  background-attachment: fixed;
+  margin: 0;
+  padding: 40px;
+  color: #eaf6ff;
+  min-height: 100vh;
+}
 
-  h2 {
-      text-align: center;
-      font-size: 32px;
-      color: white;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-      margin-bottom: 30px;
-  }
+/* TITULO */
+h2 {
+  text-align: center;
+  font-size: 32px;
+  color: #eaf6ff;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+  margin-bottom: 30px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
 
-  /* Tabla */
-  table {
-      width: 100%;
-      border-collapse: collapse;
-      background: rgba(255,255,255,0.95);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-  }
+/* TABLA */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(255,255,255,0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+  backdrop-filter: blur(8px);
+}
 
+th, td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 14px;
+  color: #f1f7fc;
+}
+
+th {
+  background: linear-gradient(135deg, #1e5f9e, #144e78);
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+  background-color: rgba(255,255,255,0.05);
+}
+
+tr:hover {
+  background-color: rgba(110,187,233,0.15);
+  transition: background 0.25s ease;
+}
+
+/* BOTONES */
+.btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #1e5f9e, #144e78);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  margin-right: 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #2980b9, #1c5f8c);
+  transform: translateY(-2px);
+}
+
+/* CONTENEDOR BOTONES */
+.btn-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  gap: 10px;
+}
+
+/* PÁRRAFOS */
+p {
+  text-align: center;
+  font-size: 16px;
+  color: #eaf6ff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+/* HEADER */
+header {
+  background-color: rgba(10, 34, 57, 0.9);
+  height: 60px;
+  width: 100%;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  position: absolute;
+  top: 0;
+  z-index: 10;
+}
+
+/* LOGO */
+.logo {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 5px 0;
+}
+
+.logo img {
+  height: 54px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.5));
+  border-radius: 50%;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
   th, td {
-      padding: 10px 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-      font-size: 14px;
+    font-size: 12px;
+    padding: 10px;
   }
-
-  th {
-      background-color: #34495e;
-      color: white;
-      font-weight: 600;
-  }
-
-  tr:hover {
-      background-color: rgba(52, 152, 219, 0.1);
-  }
-
-  /* Botones */
   .btn {
-      padding: 12px 24px;
-      background-color: #34495e;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s, transform 0.2s;
-      margin-top: 20px;
-      margin-right: 20px;
+    width: 100%;
+    font-size: 14px;
   }
-
-  .btn:hover {
-      background-color: #2c3e50;
-      transform: translateY(-2px);
-  }
-
-  /* Contenedor botones */
   .btn-container {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 30px;
+    flex-direction: column;
+    align-items: center;
   }
-
-  p {
-      text-align: center;
-      font-size: 16px;
-      color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  }
-  header {
-      background-color: rgba(44, 62, 80, 0.9);
-      height: 60px;
-      width: 99.9%;
-      left:0px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      position: absolute;
-      top: 0px;
-
-      z-index: 10;
-    }
-    .logo {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      padding: 5px 0;
-    }
-    .logo img {
-      height: 54px;
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
-      border-radius: 50%;
-    }
+}
 </style>
+
 </head>
 <header>
   <a class="logo">

@@ -104,134 +104,202 @@ $usuarios = $conexion->query("
 <head>
 <meta charset="UTF-8">
 <title>Administrador de Horas - Root</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
-body {
-  font-family: "Poppins", sans-serif;
-  background-image: url('landingpage.jpg');
-  background-size: cover;
-  background-position: center;
+/* ======== ESTILO GENERAL ======== */
+* {
+  box-sizing: border-box;
   margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, #1a2433, #2b5f87);
+  background-attachment: fixed;
   min-height: 100vh;
-  display: flex;
-  flex: 1;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 65px;
+  padding: 100px 20px 40px;
+  color: #edf1f6;
 }
- header {
-      background-color: rgba(44, 62, 80, 0.9);
-      height: 60px;
-      width: 99.9%;
-      left:0px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-      position: absolute;
-      top: 0px;
 
-      z-index: 10;
-    }
+/* ======== HEADER ======== */
+header {
+  background: rgba(26, 36, 51, 0.9);
+  backdrop-filter: blur(10px);
+  height: 70px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+.logo img {
+  height: 54px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+/* ======== TÍTULO ======== */
 h2 {
-      text-align: center;
-      font-size: 32px;
-      color: white;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-      margin-bottom: 30px;
-  }
+  text-align: center;
+  font-size: 32px;
+  color: #6ebbe9;
+  text-shadow: 0 0 8px rgba(110, 187, 233, 0.3);
+  margin-bottom: 30px;
+  font-weight: 600;
+}
+
+/* ======== TABLA ======== */
 table {
   width: 100%;
   max-width: 1000px;
   border-collapse: collapse;
-  background: rgba(255,255,255,0.95);
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  margin-bottom: 25px;
+  animation: fadeIn 0.8s ease-in-out;
 }
+
 th, td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  font-size: 14px;
+  padding: 12px;
+  font-size: 15px;
   text-align: center;
+  color: #edf1f6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
+
 th {
-  background: #224358;
-  color: white;
+  background: rgba(110, 187, 233, 0.15);
+  color: #6ebbe9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+
+tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.04);
+}
+tr:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease;
+}
+
+/* ======== INPUTS ======== */
 input[type="number"] {
-  width: 80px;
-  padding: 6px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  width: 90px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: #edf1f6;
+  text-align: center;
+  transition: 0.3s;
 }
+input[type="number"]:focus {
+  border-color: #6ebbe9;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+}
+
+/* ======== BOTONES DE TABLA ======== */
 button {
-  background: #27ae60;
-  color: white;
+  background: #6ebbe9;
+  color: #1a2433;
   border: none;
   padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  transition: all 0.3s ease;
   margin: 4px 2px;
+  box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
 }
 button:hover {
-  background: #219150;
+  background: #2b5f87;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(110, 187, 233, 0.5);
+  transform: translateY(-2px);
 }
+
+/* ======== TEXTO DESTACADO ======== */
 .pendientes {
-  color: #e67e22;
+  color: #f1c40f;
   font-weight: bold;
+  text-shadow: 0 0 6px rgba(241, 196, 15, 0.4);
 }
+
+/* ======== CONTENEDOR DE BOTONES PRINCIPALES ======== */
 .btn-container {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 20px;
   margin-top: 30px;
-  flex-wrap: wrap;
 }
-.btn-container form {
-  margin: 0;
-}
+
 .btn {
-  background: linear-gradient(to right, #224358, #163041ff);
-  color: white;
+  background: #6ebbe9;
+  color: #1a2433;
   border: none;
   padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: 10px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
+  transition: all 0.3s ease;
 }
 .btn:hover {
+  background: #2b5f87;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(110, 187, 233, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
-  background: linear-gradient(to right, #000508ff, #000502ff);
 }
- .logo {
-      display: flex;
-      align-items: center;
-      height: 100%;
-      padding: 5px 0;
-    }
-    .logo img {
-      height: 54px;
-      width: auto;
-      object-fit: contain;
-      filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.4));
-      border-radius: 50%;
-    }
+
+/* ======== ANIMACIÓN ======== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+  h2 { font-size: 26px; }
+  table { font-size: 14px; }
+  th, td { padding: 8px; }
+  .btn { font-size: 14px; padding: 10px 18px; }
+}
 </style>
 </head>
 <body>
 <header>
-      <a class="logo">
-      <img src="logo.jpeg" alt="Logo Cooperativa">
-    </a>
+  <a class="logo">
+    <img src="logo.jpeg" alt="Logo Cooperativa">
+  </a>
 </header>
+
+
+
+<!-- Aquí sigue tu tabla y funcionalidad PHP original -->
+</body>
+</html>
+
   <h2>Gestión de Horas de Socios</h2>
 
   <?php if (isset($_GET["msg"])): ?>
