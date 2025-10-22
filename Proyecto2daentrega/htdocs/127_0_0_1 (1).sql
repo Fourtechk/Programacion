@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 12-09-2025 a las 02:40:44
+-- Tiempo de generación: 22-10-2025 a las 05:01:39
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -22,7 +22,6 @@ SET time_zone = "+00:00";
 --
 CREATE DATABASE IF NOT EXISTS `sistema` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE `sistema`;
-
 -- --------------------------------------------------------
 
 --
@@ -44,8 +43,8 @@ CREATE TABLE `horas` (
 --
 
 INSERT INTO `horas` (`id_horas`, `semanales_req`, `cumplidas`, `fecha_t`, `id_miembro`, `horas_pendientes`, `justificativos`) VALUES
-(1, 0, 61, NULL, 1, 0, ''),
-(2, 10, 33, NULL, 3, 4, ''),
+(1, 0, 101, NULL, 1, 0, '|asistio=1;horas=11;actividad=|asistio=1;horas=11;actividad=|asistio=1;horas=11;actividad=|asistio=1;horas=33;actividad=Aprobadas por admin|asistio=1;horas=3;actividad=|asistio=1;horas=3;actividad=Aprobadas por admin|asistio=1;horas=4;actividad=|asistio=0;justificativo=xq ta wacho justificativos/just_1_1757871999.pdf|asistio=0;justificativo=sqwad justificativos/just_1_1757873110.png|asistio=1;horas=4;actividad=Aprobadas por admin|asistio=0;justificativo=dwada justificativos/just_1_1757874992.jpeg|asistio=0;justificativo=wdw justificativos/just_1_1757875621.jpeg|asistio=0;justificativo=no pude|asistio=0;justificativo=no pude justificativos/just_1_1757876780.jpg'),
+(2, 10, 69, NULL, 3, 0, '|asistio=1;horas=4;actividad=caca|asistio=1;horas=21;actividad=Aprobadas por admin|asistio=0;justificativo=pq no pude|asistio=1;horas=3;actividad=swd|asistio=1;horas=11;actividad=|asistio=1;horas=14;actividad=Aprobadas por admin'),
 (3, 0, 0, NULL, 2, 0, ''),
 (4, 10, 0, NULL, 7, 0, '');
 
@@ -60,6 +59,7 @@ CREATE TABLE `miembro` (
   `nombre` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `aprobado` tinyint(1) DEFAULT 0,
   `es_miembro` tinyint(1) DEFAULT 0,
   `admin` tinyint(1) DEFAULT 0,
   `estado` varchar(100) DEFAULT NULL,
@@ -71,14 +71,14 @@ CREATE TABLE `miembro` (
 -- Volcado de datos para la tabla `miembro`
 --
 
-INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`) VALUES
-(1, 'Tomas', 'tomas@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 'pendiente', NULL, NULL),
-(2, 'Admin General', 'admin@coop.com', '$2y$10$KjS5Epbjs5SduXUqTflNOek5rDn6Xnv5OGAzpWw/szXmtgLOgRzXy', 0, 0, 'aprobado', NULL, NULL),
-(3, 'CuloCon', 'culo@gmail.com', '$2y$10$l.osSp1Yx8OVshXJJNToZOf6NaKDD1bh/pWiXwDGE3OSoaqpKuJMC', 1, 0, NULL, NULL, NULL),
-(4, 'Alberto', 'alberto@gmail.com', '$2y$10$SAJ/SBaKZU7G4ePeRny7ae9mrkbs/OggUtTofZEFiLLlgZKpAk2lW', 0, 0, NULL, NULL, NULL),
-(5, 'caca', 'caca@gmail.com', '$2y$10$oLbDloLqX1YhJ1zRM1IJBuhK2q86EO.vrFxD4ymaa5ZuLIt7iK1Iu', 0, 0, NULL, NULL, NULL),
-(6, 'Santino', 'santi@gmail.com', '$2y$10$1M/CMVSKhsyWn4wVGmj8meVR/JTQXZHEV826yVDNJm9JUMXzenAiW', 0, 0, NULL, NULL, NULL),
-(7, 'Admin', 'admin@cooperativa.com', '$2y$10$GYi1Y560hitzs8MVotsWgetP9EOjsXD6Fe/C5vdwBjLWHhjILXIgC', 1, 1, NULL, NULL, NULL);
+INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `aprobado`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`) VALUES
+(1, 'Tomas', 'tomas@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 1, 'pendiente', 66, NULL),
+(2, 'Admin General', 'admin@coop.com', '$2y$10$KjS5Epbjs5SduXUqTflNOek5rDn6Xnv5OGAzpWw/szXmtgLOgRzXy', 1, 0, 0, 'aprobado', NULL, NULL),
+(3, 'CuloCon', 'culo@gmail.com', '$2y$10$l.osSp1Yx8OVshXJJNToZOf6NaKDD1bh/pWiXwDGE3OSoaqpKuJMC', 1, 1, 0, NULL, NULL, NULL),
+(4, 'Alberto', 'alberto@gmail.com', '$2y$10$SAJ/SBaKZU7G4ePeRny7ae9mrkbs/OggUtTofZEFiLLlgZKpAk2lW', 1, 0, 0, NULL, NULL, NULL),
+(5, 'caca', 'caca@gmail.com', '$2y$10$oLbDloLqX1YhJ1zRM1IJBuhK2q86EO.vrFxD4ymaa5ZuLIt7iK1Iu', 1, 0, 0, NULL, NULL, NULL),
+(6, 'Santino', 'santi@gmail.com', '$2y$10$1M/CMVSKhsyWn4wVGmj8meVR/JTQXZHEV826yVDNJm9JUMXzenAiW', 1, 0, 0, NULL, NULL, NULL),
+(7, 'Admin', 'admin@cooperativa.com', '$2y$10$GYi1Y560hitzs8MVotsWgetP9EOjsXD6Fe/C5vdwBjLWHhjILXIgC', 1, 1, 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -112,9 +112,6 @@ INSERT INTO `pago` (`id_pago`, `monto`, `concepto`, `estado_pa`, `fecha_p`, `com
 --
 
 CREATE TABLE `postulacion` (
-  `nombre` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
   `id_postulacion` int(11) NOT NULL,
   `fecha_po` date DEFAULT NULL,
   `estado_po` enum('pendiente','aceptada','rechazada') DEFAULT 'pendiente',
@@ -160,6 +157,112 @@ CREATE TABLE `unidad_habitacional` (
   `metros_cuadrados` decimal(10,2) NOT NULL,
   `estado_un` enum('ocupada','disponible','mantenimiento') DEFAULT 'disponible'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `unidad_habitacional`
+--
+
+INSERT INTO `unidad_habitacional` (`id_unidad`, `metros_cuadrados`, `estado_un`) VALUES
+(1, 45.00, 'ocupada'),
+(2, 45.00, 'disponible'),
+(3, 45.00, 'ocupada'),
+(4, 45.00, 'disponible'),
+(5, 45.00, 'disponible'),
+(6, 45.00, 'ocupada'),
+(7, 45.00, 'disponible'),
+(8, 45.00, 'disponible'),
+(9, 45.00, 'disponible'),
+(10, 45.00, 'disponible'),
+(11, 45.00, 'disponible'),
+(12, 45.00, 'disponible'),
+(13, 45.00, 'disponible'),
+(14, 45.00, 'disponible'),
+(15, 45.00, 'disponible'),
+(16, 45.00, 'disponible'),
+(17, 45.00, 'disponible'),
+(18, 45.00, 'disponible'),
+(19, 45.00, 'disponible'),
+(20, 45.00, 'disponible'),
+(21, 45.00, 'disponible'),
+(22, 45.00, 'disponible'),
+(23, 45.00, 'disponible'),
+(24, 45.00, 'disponible'),
+(25, 45.00, 'disponible'),
+(26, 45.00, 'ocupada'),
+(27, 45.00, 'disponible'),
+(28, 45.00, 'disponible'),
+(29, 45.00, 'disponible'),
+(30, 45.00, 'disponible'),
+(31, 45.00, 'disponible'),
+(32, 45.00, 'disponible'),
+(33, 45.00, 'disponible'),
+(34, 45.00, 'disponible'),
+(35, 45.00, 'disponible'),
+(36, 45.00, 'disponible'),
+(37, 45.00, 'disponible'),
+(38, 45.00, 'disponible'),
+(39, 45.00, 'disponible'),
+(40, 45.00, 'disponible'),
+(41, 45.00, 'disponible'),
+(42, 45.00, 'disponible'),
+(43, 45.00, 'disponible'),
+(44, 45.00, 'disponible'),
+(45, 45.00, 'disponible'),
+(46, 45.00, 'disponible'),
+(47, 45.00, 'disponible'),
+(48, 45.00, 'disponible'),
+(49, 45.00, 'disponible'),
+(50, 45.00, 'disponible'),
+(51, 45.00, 'disponible'),
+(52, 45.00, 'disponible'),
+(53, 45.00, 'disponible'),
+(54, 45.00, 'disponible'),
+(55, 45.00, 'disponible'),
+(56, 45.00, 'disponible'),
+(57, 45.00, 'disponible'),
+(58, 45.00, 'disponible'),
+(59, 45.00, 'disponible'),
+(60, 45.00, 'disponible'),
+(61, 45.00, 'disponible'),
+(62, 45.00, 'disponible'),
+(63, 45.00, 'disponible'),
+(64, 45.00, 'disponible'),
+(65, 45.00, 'disponible'),
+(66, 45.00, 'ocupada'),
+(67, 45.00, 'disponible'),
+(68, 45.00, 'disponible'),
+(69, 45.00, 'disponible'),
+(70, 45.00, 'disponible'),
+(71, 45.00, 'disponible'),
+(72, 45.00, 'disponible'),
+(73, 45.00, 'disponible'),
+(74, 45.00, 'disponible'),
+(75, 45.00, 'disponible'),
+(76, 45.00, 'disponible'),
+(77, 45.00, 'ocupada'),
+(78, 45.00, 'disponible'),
+(79, 45.00, 'disponible'),
+(80, 45.00, 'disponible'),
+(81, 45.00, 'disponible'),
+(82, 45.00, 'disponible'),
+(83, 45.00, 'disponible'),
+(84, 45.00, 'disponible'),
+(85, 45.00, 'disponible'),
+(86, 45.00, 'disponible'),
+(87, 45.00, 'disponible'),
+(88, 45.00, 'disponible'),
+(89, 45.00, 'disponible'),
+(90, 45.00, 'disponible'),
+(91, 45.00, 'disponible'),
+(92, 45.00, 'disponible'),
+(93, 45.00, 'disponible'),
+(94, 45.00, 'disponible'),
+(95, 45.00, 'disponible'),
+(96, 45.00, 'disponible'),
+(97, 45.00, 'disponible'),
+(98, 45.00, 'disponible'),
+(99, 45.00, 'disponible'),
+(100, 45.00, 'ocupada');
 
 --
 -- Índices para tablas volcadas
@@ -232,7 +335,7 @@ ALTER TABLE `postulacion`
 -- AUTO_INCREMENT de la tabla `unidad_habitacional`
 --
 ALTER TABLE `unidad_habitacional`
-  MODIFY `id_unidad` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_unidad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- Restricciones para tablas volcadas

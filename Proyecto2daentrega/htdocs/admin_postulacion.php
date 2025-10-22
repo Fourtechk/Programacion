@@ -185,6 +185,44 @@ header {
     align-items: center;
   }
 }
+
+@media (max-width: 1024px) {
+  .btn-container {
+    width: 220px;
+  }
+
+  body {
+    margin-right: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-container {
+    position: static;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 15px;
+    box-shadow: none;
+    background: rgba(26, 36, 51, 0.8);
+  }
+
+  .btn-container .btn {
+    width: auto;
+    min-width: 140px;
+    margin: 10px;
+    font-size: 14px;
+    padding: 10px 18px;
+  }
+
+  body {
+    margin-right: 0;
+    padding-top: 120px;
+  }
+}
+
 </style>
 
 </head>

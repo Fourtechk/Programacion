@@ -123,6 +123,7 @@ body {
   align-items: center;
   padding: 100px 20px 40px;
   color: #edf1f6;
+  margin-right: 260px;
 }
 
 /* ======== HEADER ======== */
@@ -147,6 +148,7 @@ header {
   align-items: center;
   height: 100%;
 }
+
 .logo img {
   height: 54px;
   border-radius: 50%;
@@ -157,7 +159,7 @@ header {
 h2 {
   text-align: center;
   font-size: 32px;
-  color: #6ebbe9;
+  color: #ffffffff;
   text-shadow: 0 0 8px rgba(110, 187, 233, 0.3);
   margin-bottom: 30px;
   font-weight: 600;
@@ -195,6 +197,7 @@ th {
 tr:nth-child(even) {
   background: rgba(255, 255, 255, 0.04);
 }
+
 tr:hover {
   background: rgba(255, 255, 255, 0.1);
   transition: background 0.3s ease;
@@ -211,6 +214,7 @@ input[type="number"] {
   text-align: center;
   transition: 0.3s;
 }
+
 input[type="number"]:focus {
   border-color: #6ebbe9;
   background: rgba(255, 255, 255, 0.2);
@@ -230,6 +234,7 @@ button {
   margin: 4px 2px;
   box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
 }
+
 button:hover {
   background: #2b5f87;
   color: #fff;
@@ -246,25 +251,32 @@ button:hover {
 
 /* ======== CONTENEDOR DE BOTONES PRINCIPALES ======== */
 .btn-container {
+  position: fixed;
+  top: 70px;
+  right: 0;
+  width: 260px;
+  height: calc(102% - 90px);
+  background: rgba(26, 36, 51, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 20px;
   display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 20px;
-  margin-top: 30px;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 9;
 }
 
-.btn {
-  background: #6ebbe9;
-  color: #1a2433;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
-  transition: all 0.3s ease;
+.btn-container form {
+  width: 100%;
 }
+
+.btn-container .btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
 .btn:hover {
   background: #2b5f87;
   color: #fff;
@@ -285,6 +297,44 @@ button:hover {
   th, td { padding: 8px; }
   .btn { font-size: 14px; padding: 10px 18px; }
 }
+
+@media (max-width: 1024px) {
+  .btn-container {
+    width: 220px;
+  }
+
+  body {
+    margin-right: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-container {
+    position: static;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 15px;
+    box-shadow: none;
+    background: rgba(26, 36, 51, 0.8);
+  }
+
+  .btn-container .btn {
+    width: auto;
+    min-width: 140px;
+    margin: 10px;
+    font-size: 14px;
+    padding: 10px 18px;
+  }
+
+  body {
+    margin-right: 0;
+    padding-top: 120px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -381,9 +431,6 @@ button:hover {
     </form>
     <form action="admin_comprobantes.php" method="post">
       <button type="submit" class="btn">Comprobantes</button>
-    </form>
-    <form action="admin_postulacion.php" method="post">
-      <button type="submit" class="btn">Administrar Postulaciones</button>
     </form>
     <form action="pagos.php" method="get">
     <button type="submit" class="btn">Ver Pagos</button>

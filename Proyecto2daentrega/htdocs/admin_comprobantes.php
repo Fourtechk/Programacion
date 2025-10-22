@@ -60,213 +60,225 @@ $csrf = $_SESSION['csrf'];
 <meta charset="UTF-8">
 <title>Admin - Comprobantes</title>
 <style>
+/* ======== ESTILO GENERAL ======== */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
   font-family: "Poppins", sans-serif;
 }
 
 body {
-  background: linear-gradient(135deg, #0a2239, #1e3d58);
+  background: linear-gradient(135deg, #1a2433, #2b5f87);
   background-attachment: fixed;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  color: #eaf6ff;
-}
-
-/* HEADER */
-header {
-  background-color: rgba(10, 34, 57, 0.9);
-  height: 60px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-  color: #eaf6ff;
-  font-size: 20px;
-  font-weight: 600;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
-  letter-spacing: 0.5px;
+  padding: 100px 20px 40px;
+  color: #edf1f6;
+  margin-right: 260px;
 }
 
-header .logo {
-  position: absolute;
-  left: 20px;
+/* ======== HEADER ======== */
+header {
+  background: rgba(26, 36, 51, 0.9);
+  backdrop-filter: blur(10px);
+  height: 70px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.logo {
   display: flex;
   align-items: center;
   height: 100%;
-  background: none !important;
-  border: none !important;
-  outline: none !important;
 }
-
-header .logo img {
-  height: 50px;
+.logo img {
+  height: 54px;
   border-radius: 50%;
-  object-fit: contain;
-  filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.5));
-  pointer-events: none;
-  user-select: none;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
-/* MAIN */
-main {
-  flex: 1;
-  padding: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* CONTENEDOR */
-.contenedor {
-  width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
+/* ======== TÍTULO ======== */
 h2 {
   text-align: center;
   font-size: 32px;
-  color: #eaf6ff;
-  text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+  color: #ffffffff;
+  text-shadow: 0 0 8px rgba(110, 187, 233, 0.3);
   margin-bottom: 30px;
-  font-weight: 700;
-}
-
-/* FILTRO */
-form.filter {
-  margin-bottom: 25px;
-  color: #eaf6ff;
   font-weight: 600;
-  text-align: center;
-  background: rgba(255,255,255,0.08);
-  padding: 10px 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  backdrop-filter: blur(5px);
 }
 
-form.filter select {
-  margin-left: 10px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.3);
-  background: rgba(255,255,255,0.1);
-  color: #eaf6ff;
-}
-
-/* TABLA */
+/* ======== TABLA ======== */
 table {
   width: 100%;
+  max-width: 1000px;
   border-collapse: collapse;
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 6px 25px rgba(0,0,0,0.3);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  margin-bottom: 25px;
+  animation: fadeIn 0.8s ease-in-out;
 }
 
 th, td {
-  padding: 14px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding: 12px;
+  font-size: 15px;
   text-align: center;
-  font-size: 14px;
-  color: #f1f7fc;
+  color: #edf1f6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 th {
-  background: linear-gradient(135deg, #1e5f9e, #144e78);
-  color: #fff;
-  font-weight: 600;
+  background: rgba(110, 187, 233, 0.15);
+  color: #6ebbe9;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 tr:nth-child(even) {
-  background-color: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.04);
 }
-
 tr:hover {
-  background-color: rgba(110,187,233,0.15);
-  transition: background 0.25s ease;
+  background: rgba(255, 255, 255, 0.1);
+  transition: background 0.3s ease;
 }
 
-/* LINKS */
-a {
-  background: #1e6fa8;
+/* ======== BOTONES DE TABLA ======== */
+button {
+  background: #6ebbe9;
+  color: #1a2433;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin: 4px 2px;
+  box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
+}
+button:hover {
+  background: #2b5f87;
   color: #fff;
+  box-shadow: 0 0 12px rgba(110, 187, 233, 0.5);
+  transform: translateY(-2px);
+}
+
+/* ======== LINKS ======== */
+a {
+  background: #6ebbe9;
+  color: #1a2433;
   padding: 6px 12px;
   border-radius: 6px;
   text-decoration: none;
   font-size: 13px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(110, 187, 233, 0.3);
   transition: all 0.25s ease;
 }
-
 a:hover {
-  background: #3498db;
-  transform: scale(1.05);
-}
-
-/* BOTONES */
-button {
-  border: none;
-  border-radius: 20px;
-  height: 35px;
-  width: 90px;
-  font-weight: 700;
-  color: white;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
-}
-
-button.aprobar {
-  background: #27ae60;
-}
-
-button.rechazado {
-  background: #c0392b;
-  margin-top: 4px;
-}
-
-button:hover {
-  transform: scale(1.05);
-}
-
-/* NAV BUTTONS */
-.nav-buttons {
-  display: flex;
-  gap: 15px;
-  margin: 20px 0;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.nav-buttons button {
-  border-radius: 10px;
-  width: 200px;
-  height: 50px;
-  font-size: 15px;
-  background: linear-gradient(135deg, #1e5f9e, #144e78);
+  background: #2b5f87;
   color: #fff;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
-  transition: background 0.25s ease, transform 0.25s ease;
+  transform: scale(1.05);
 }
 
-.nav-buttons button:hover {
-  background: linear-gradient(135deg, #2980b9, #1c5f8c);
+/* ======== MENÚ LATERAL ======== */
+.btn-container {
+  position: fixed;
+  top: 70px;
+  right: 0;
+  width: 260px;
+  height: calc(102% - 90px);
+  background: rgba(26, 36, 51, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+  z-index: 9;
+}
+
+.btn-container form {
+  width: 100%;
+}
+
+.btn-container .btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 8px;
+}
+
+.btn:hover {
+  background: #2b5f87;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(110, 187, 233, 0.5);
   transform: translateY(-2px);
 }
 
-/* RESPONSIVE */
-@media(max-width:700px) {
-  th, td { font-size: 12px; padding: 10px; }
-  button { width: 75px; font-size: 12px; }
-  .nav-buttons { flex-direction: column; align-items: center; }
-  form.filter { font-size: 14px; }
+/* ======== ANIMACIÓN ======== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+  h2 { font-size: 26px; }
+  table { font-size: 14px; }
+  th, td { padding: 8px; }
+  .btn { font-size: 14px; padding: 10px 18px; }
+}
+
+@media (max-width: 1024px) {
+  .btn-container {
+    width: 220px;
+  }
+
+  body {
+    margin-right: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-container {
+    position: static;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 15px;
+    box-shadow: none;
+    background: rgba(26, 36, 51, 0.85);
+  }
+
+  .btn-container .btn {
+    width: auto;
+    min-width: 140px;
+    margin: 10px;
+    font-size: 14px;
+    padding: 10px 18px;
+  }
+
+  body {
+    margin-right: 0;
+    padding-top: 120px;
+  }
+}
+
+
 </style>
 
 </head>
@@ -327,14 +339,12 @@ button:hover {
 
   </table>
 
-  <div class="nav-buttons">
-    <form action="admin.php" method="post"><button type="submit">Aprobar Usuarios</button></form>
-    <form action="admin_horas.php" method="post"><button type="submit">Administrar Horas</button></form>
-    
-  <form action="pagos.php" method="get">
-    <button type="submit" class="btn">Ver Pagos</button>
-  </form>
-  </div>
+  <div class="btn-container">
+  <form action="admin.php" method="post"><button type="submit" class="btn">Aprobar Usuarios</button></form>
+  <form action="admin_horas.php" method="post"><button type="submit" class="btn">Administrar Horas</button></form>
+  <form action="pagos.php" method="get"><button type="submit" class="btn">Ver Pagos</button></form>
+</div>
+
 
 </main>
 </body>

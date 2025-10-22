@@ -18,7 +18,7 @@ $id = $_SESSION["id"];
 $mensajeHoras = "";
 
 // Verificar que sea miembro o admin
-$sql = "SELECT es_miembro, admin, nombre FROM miembro WHERE id_miembro = ?";
+$sql = "SELECT es_miembro, admin, nombre, id_unidad FROM miembro WHERE id_miembro = ?";
 $stmtUser = $conexion->prepare($sql);
 $stmtUser->bind_param("i", $id);
 $stmtUser->execute();
@@ -151,120 +151,203 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
   <title>Pagos y Horas - Cooperativa</title>
   <link rel="stylesheet" href="landingpage.css">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: "Poppins", sans-serif;
-        }
+/* ======== ESTILO GENERAL ======== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+}
 
-        body {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #1a2433, #2b5f87);
-            color: #edf1f6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 20px;
-        }
+body {
+  background: linear-gradient(135deg, #1a2433, #2b5f87);
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100px 20px 40px;
+  color: #edf1f6;
+}
 
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-weight: 600;
-            color: #6ebbe9;
-            text-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
-        }
+/* ======== HEADER ======== */
+header {
+  background: rgba(26, 36, 51, 0.9);
+  backdrop-filter: blur(10px);
+  height: 70px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
 
-        .tabla-contenedor {
-            width: 100%;
-            max-width: 900px;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-            overflow: hidden;
-            padding: 20px;
-            animation: fadeIn 0.8s ease-in-out;
-        }
+header a {
+  color: #edf1f6;
+  text-decoration: none;
+  font-weight: 600;
+  background: #6ebbe9;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
+  transition: all 0.3s ease;
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
+header a:hover {
+  background: #2b5f87;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(110, 187, 233, 0.5);
+  transform: translateY(-2px);
+}
 
-        thead {
-            background: rgba(255, 255, 255, 0.1);
-        }
+/* ======== TÍTULOS ======== */
+h1, h2, h3 {
+  text-align: center;
+  color: #ffffffff;
+  text-shadow: 0 0 8px rgba(110, 187, 233, 0.3);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
 
-        th, td {
-            padding: 14px 16px;
-            text-align: center;
-        }
+/* ======== CONTENEDORES ======== */
+.form-wrapper {
+  width: 100%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
 
-        th {
-            color: #6ebbe9;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
+.form-box {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.8s ease-in-out;
+}
 
-        tr {
-            transition: background 0.3s ease;
-        }
+/* ======== FORMULARIOS ======== */
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: #edf1f6;
+  resize: vertical;
+}
 
-        tr:nth-child(even) {
-            background: rgba(255, 255, 255, 0.04);
-        }
+input[type="radio"] {
+  width: auto;
+  margin-right: 8px;
+}
 
-        tr:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
+label {
+  font-weight: 500;
+  color: #edf1f6;
+}
 
-        td {
-            color: #edf1f6;
-            font-weight: 300;
-        }
+/* ======== BOTONES ======== */
+button, .postularme {
+  background: #6ebbe9;
+  color: #1a2433;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
+}
 
-        .boton-volver {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 10px 22px;
-            background-color: #6ebbe9;
-            color: #1a2433;
-            text-decoration: none;
-            font-weight: 600;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(110, 187, 233, 0.4);
-        }
+button:hover, .postularme:hover {
+  background: #2b5f87;
+  color: #fff;
+  box-shadow: 0 0 14px rgba(110, 187, 233, 0.5);
+  transform: translateY(-2px);
+}
 
-        .boton-volver:hover {
-            background-color: #2b5f87;
-            color: #fff;
-            box-shadow: 0 0 15px rgba(110, 187, 233, 0.6);
-            transform: translateY(-2px);
-        }
+/* ======== TABLA ======== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+th, td {
+  padding: 14px;
+  text-align: center;
+  font-size: 14px;
+  color: #edf1f6;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-        @media (max-width: 768px) {
-            .tabla-contenedor {
-                padding: 10px;
-            }
+th {
+  background: rgba(110, 187, 233, 0.15);
+  color: #6ebbe9;
+  font-weight: 600;
+  text-transform: uppercase;
+}
 
-            table {
-                font-size: 14px;
-            }
+tr:nth-child(even) {
+  background-color: rgba(255, 255, 255, 0.04);
+}
 
-            th, td {
-                padding: 10px;
-            }
-        }
-    </style>
+tr:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background 0.25s ease;
+}
+
+/* ======== LINKS ======== */
+a {
+  color: #6ebbe9;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+a:hover {
+  color: #fff;
+}
+
+/* ======== ANIMACIÓN ======== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+  .form-wrapper {
+    padding: 10px;
+  }
+
+  table {
+    font-size: 13px;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+}
+</style>
 </head>
 <body>
   <header>
@@ -274,61 +357,72 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
   </header>
   <main>
     <div class="form-wrapper">
-      <?php if ($user): ?>
-        <h1 class="titulo-principal">Bienvenido, <span><?= htmlspecialchars($user['nombre']) ?></span></h1>
-      <?php endif; ?>
+  <?php if ($user): ?>
+    <h1 class="titulo-principal">Bienvenido, <span><?= htmlspecialchars($user['nombre']) ?></span></h1>
+  <?php endif; ?>
 
-      <!-- Caja: Subir comprobante -->
-      <div class="form-box">
-        <h2>Subir comprobante</h2>
-        <form action="subir_comprobante.php" method="POST" enctype="multipart/form-data">
-          <input type="number" name="monto" placeholder="Monto" required>
-          <input type="text" name="concepto" placeholder="Concepto" required>
-          <input type="file" name="archivo" required>
-          <button type="submit" class="postularme">Subir comprobante</button>
-        </form>
-      </div>
+  <!-- Caja: Unidad Habitacional -->
+  <div class="form-box">
+    <h2>Unidad Habitacional</h2>
+    <?php if (!empty($user['id_unidad'])): ?>
+      <p>Tu unidad asignada es: <strong style="color:#6ebbe9; font-size:18px;">#<?= htmlspecialchars($user['id_unidad']) ?></strong></p>
+    <?php else: ?>
+      <p><em>No tenés una unidad asignada actualmente.</em></p>
+    <?php endif; ?>
+  </div>
 
-      <!-- Caja: Historial de comprobantes -->
-      <div class="form-box">
-        <h2>Historial de comprobantes</h2>
-        <table>
+  <!-- Caja: Subir comprobante -->
+  <div class="form-box">
+    <h2>Subir comprobante</h2>
+    <form action="subir_comprobante.php" method="POST" enctype="multipart/form-data">
+      <input type="number" name="monto" placeholder="Monto" required>
+      <input type="text" name="concepto" placeholder="Concepto" required>
+      <input type="file" name="archivo" required>
+      <button type="submit" class="postularme">Subir comprobante</button>
+    </form>
+  </div>
+
+  <!-- Caja: Historial de comprobantes -->
+  <div class="form-box">
+    <h2>Historial de comprobantes</h2>
+    <table>
+      <tr>
+        <th>Monto</th>
+        <th>Concepto</th>
+        <th>Archivo</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+      </tr>
+      <?php if ($comprobantes && $comprobantes->num_rows > 0): ?>
+        <?php while($c = $comprobantes->fetch_assoc()): ?>
           <tr>
-            <th>Monto</th>
-            <th>Concepto</th>
-            <th>Archivo</th>
-            <th>Estado</th>
-            <th>Fecha</th>
+            <td>$<?= number_format((float)$c['monto'],2,',','.') ?></td>
+            <td><?= htmlspecialchars($c['concepto']) ?></td>
+            <td>
+              <?php if (!empty($c['comprobante'])): ?>
+                <a href="<?= htmlspecialchars($c['comprobante']) ?>" target="_blank">Ver</a>
+              <?php else: ?>
+                <em>Sin archivo</em>
+              <?php endif; ?>
+            </td>
+            <td>
+              <?php
+                if($c['estado_pa'] === 'aprobado') echo "✅ <span style='color:green;'>Aprobado</span>";
+                elseif($c['estado_pa'] === 'rechazado') echo "❌ <span style='color:red;'>Rechazado</span>";
+                else echo "⏳ Pendiente";
+              ?>
+            </td>
+            <td><?= htmlspecialchars($c['fecha_p']) ?></td>
           </tr>
-          <?php if ($comprobantes && $comprobantes->num_rows > 0): ?>
-            <?php while($c = $comprobantes->fetch_assoc()): ?>
-              <tr>
-                <td>$<?= number_format((float)$c['monto'],2,',','.') ?></td>
-                <td><?= htmlspecialchars($c['concepto']) ?></td>
-                <td>
-                  <?php if (!empty($c['comprobante'])): ?>
-                    <a href="<?= htmlspecialchars($c['comprobante']) ?>" target="_blank">Ver</a>
-                  <?php else: ?>
-                    <em>Sin archivo</em>
-                  <?php endif; ?>
-                </td>
-                <td>
-                  <?php
-                    if($c['estado_pa'] === 'aprobado') echo "✅ <span style='color:green;'>Aprobado</span>";
-                    elseif($c['estado_pa'] === 'rechazado') echo "❌ <span style='color:red;'>Rechazado</span>";
-                    else echo "⏳ Pendiente";
-                  ?>
-                </td>
-                <td><?= htmlspecialchars($c['fecha_p']) ?></td>
-              </tr>
-            <?php endwhile; ?>
-          <?php else: ?>
-            <tr>
-              <td colspan="5"><em>No hay comprobantes</em></td>
-            </tr>
-          <?php endif; ?>
-        </table>
-      </div>
+        <?php endwhile; ?>
+      <?php else: ?>
+        <tr>
+          <td colspan="5"><em>No hay comprobantes</em></td>
+        </tr>
+      <?php endif; ?>
+    </table>
+  </div>
+
       <!-- Caja: Mis Horas -->
       <div class="form-box">
         <h2>Mis Horas</h2>
@@ -409,20 +503,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
  
 <?php if (!empty($user) && $user['admin'] == 1): ?>
   <div style="margin-top: 30px; text-align: center;">
-    <form action="admin.php" method="post">
-      <button type="submit" style="
-        background: #34495e;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 10px 20px;
-        font-size: 15px;
-        cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        transition: background 0.2s ease;
-      ">Ir al Panel de Administración</button>
-    </form>
-  </div>
+  <form action="admin.php" method="post">
+    <button type="submit" class="btn">Ir al Panel de Administración</button>
+  </form>
+</div>
+
 <?php endif; ?>
 
 </div>
