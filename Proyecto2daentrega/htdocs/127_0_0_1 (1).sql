@@ -366,6 +366,22 @@ ALTER TABLE `postulacion`
   ADD CONSTRAINT `fk_postulacion_miembro` FOREIGN KEY (`id_miembro`) REFERENCES `miembro` (`id_miembro`);
 COMMIT;
 
+ALTER TABLE miembro ADD foto_perfil VARCHAR(255) NULL;
+
+SELECT
+    m.nombre AS nombre_completo,
+    m.email,
+    m.id_unidad,
+    m.fecha_ingreso AS fecha_socio,
+    m.foto_perfil AS foto_perfil_url,
+    uh.metros_cuadrados,
+    uh.estado_un
+FROM
+    miembro m
+LEFT JOIN
+    unidad_habitacional uh ON m.id_unidad = uh.id_unidad
+WHERE
+    m.id_miembro = 1; -- Reemplaza '1' con la variable del ID del usuario logueado
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -32,9 +32,31 @@ if (isset($_GET["aprobar"])) {
 
 // Cambiar estado de miembro
 if (isset($_GET["socio"]) && isset($_GET["id"])) {
-    $id = intval($_GET["id"]);
+    $id_miembro = intval($_GET["id"]);
     $socio = intval($_GET["socio"]);
-    $conexion->query("UPDATE miembro SET es_miembro=$socio WHERE id_miembro=$id");
+    
+    $query = "";
+    
+    // Si se está haciendo 'es_miembro=1' (Hacer miembro), actualizamos la fecha
+    if ($socio === 1) {
+        $fecha_actual = date("Y-m-d H:i:s"); // Formato DATETIME (Recomendado)
+        
+        // Usamos una sentencia preparada por seguridad y para manejar la variable de fecha
+        $stmt = $conexion->prepare("
+            UPDATE miembro 
+            SET 
+                es_miembro = 1, 
+                fecha_ingreso = ? 
+            WHERE 
+                id_miembro = ?
+        ");
+        $stmt->bind_param("si", $fecha_actual, $id_miembro);
+        $stmt->execute();
+        
+    } else {
+        // Si se está quitando el estado de miembro (socio=0), solo actualizamos el estado
+        $conexion->query("UPDATE miembro SET es_miembro=0 WHERE id_miembro=$id_miembro");
+    }
 }
 
 // Cambiar estado de administrador
