@@ -44,9 +44,7 @@ CREATE TABLE `horas` (
 
 INSERT INTO `horas` (`id_horas`, `semanales_req`, `cumplidas`, `fecha_t`, `id_miembro`, `horas_pendientes`, `justificativos`) VALUES
 (1, 0, 101, NULL, 1, 0, '|asistio=1;horas=11;actividad=|asistio=1;horas=11;actividad=|asistio=1;horas=11;actividad=|asistio=1;horas=33;actividad=Aprobadas por admin|asistio=1;horas=3;actividad=|asistio=1;horas=3;actividad=Aprobadas por admin|asistio=1;horas=4;actividad=|asistio=0;justificativo=xq ta wacho justificativos/just_1_1757871999.pdf|asistio=0;justificativo=sqwad justificativos/just_1_1757873110.png|asistio=1;horas=4;actividad=Aprobadas por admin|asistio=0;justificativo=dwada justificativos/just_1_1757874992.jpeg|asistio=0;justificativo=wdw justificativos/just_1_1757875621.jpeg|asistio=0;justificativo=no pude|asistio=0;justificativo=no pude justificativos/just_1_1757876780.jpg'),
-(2, 10, 69, NULL, 3, 0, '|asistio=1;horas=4;actividad=caca|asistio=1;horas=21;actividad=Aprobadas por admin|asistio=0;justificativo=pq no pude|asistio=1;horas=3;actividad=swd|asistio=1;horas=11;actividad=|asistio=1;horas=14;actividad=Aprobadas por admin'),
-(3, 0, 0, NULL, 2, 0, ''),
-(4, 10, 0, NULL, 7, 0, '');
+(2, 10, 69, NULL, 2, 0, '|asistio=1;horas=4;actividad=caca|asistio=1;horas=21;actividad=Aprobadas por admin|asistio=0;justificativo=pq no pude|asistio=1;horas=3;actividad=swd|asistio=1;horas=11;actividad=|asistio=1;horas=14;actividad=Aprobadas por admin');
 
 -- --------------------------------------------------------
 
@@ -64,23 +62,17 @@ CREATE TABLE `miembro` (
   `admin` tinyint(1) DEFAULT 0,
   `estado` varchar(100) DEFAULT NULL,
   `id_unidad` int(11) DEFAULT NULL,
-  `fecha_ingreso` date DEFAULT NULL
+  `fecha_ingreso` date DEFAULT NULL,
+  `foto_perfil` VARCHAR(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `miembro`
 --
 
-INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `aprobado`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`) VALUES
-(1, 'Tomas', 'tomas@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 1, 'pendiente', 66, NULL),
-(2, 'Admin General', 'admin@coop.com', '$2y$10$KjS5Epbjs5SduXUqTflNOek5rDn6Xnv5OGAzpWw/szXmtgLOgRzXy', 1, 0, 0, 'aprobado', NULL, NULL),
-(3, 'CuloCon', 'culo@gmail.com', '$2y$10$l.osSp1Yx8OVshXJJNToZOf6NaKDD1bh/pWiXwDGE3OSoaqpKuJMC', 1, 1, 0, NULL, NULL, NULL),
-(4, 'Alberto', 'alberto@gmail.com', '$2y$10$SAJ/SBaKZU7G4ePeRny7ae9mrkbs/OggUtTofZEFiLLlgZKpAk2lW', 1, 0, 0, NULL, NULL, NULL),
-(5, 'caca', 'caca@gmail.com', '$2y$10$oLbDloLqX1YhJ1zRM1IJBuhK2q86EO.vrFxD4ymaa5ZuLIt7iK1Iu', 1, 0, 0, NULL, NULL, NULL),
-(6, 'Santino', 'santi@gmail.com', '$2y$10$1M/CMVSKhsyWn4wVGmj8meVR/JTQXZHEV826yVDNJm9JUMXzenAiW', 1, 0, 0, NULL, NULL, NULL),
-(7, 'Admin', 'admin@cooperativa.com', '$2y$10$GYi1Y560hitzs8MVotsWgetP9EOjsXD6Fe/C5vdwBjLWHhjILXIgC', 1, 1, 1, NULL, NULL, NULL);
-
--- --------------------------------------------------------
+INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `aprobado`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`, `foto_perfil`) VALUES
+(1, 'Administrador General', 'admin@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 1, 'activo', 1, '2025-01-01', 'perfiles/perfil_1_1761134331.jpg'),
+(2, 'Miembro', 'miembro@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 0, 'activo', 2, '2025-10-22', 'perfiles/perfil_8_1761134422.jpg');
 
 --
 -- Estructura de tabla para la tabla `pago`
@@ -102,8 +94,7 @@ CREATE TABLE `pago` (
 --
 
 INSERT INTO `pago` (`id_pago`, `monto`, `concepto`, `estado_pa`, `fecha_p`, `comprobante`, `metodo_pago`, `id_miembro`) VALUES
-(1, 0.18, 'Cuota Septiembre', 'pendiente', '2025-09-11', 'uploads/version2_fix.zip', 'efectivo', 1),
-(2, 453.00, 'Couta abril', 'aprobado', '2025-09-10', 'comprobantes/1757543214_IMG_20250513_214946.jpg', 'efectivo', 3);
+(1, 453.00, 'Couta abril', 'aprobado', '2025-09-10', 'comprobantes/1757543214_IMG_20250513_214946.jpg', 'efectivo', 1);
 
 -- --------------------------------------------------------
 
@@ -141,11 +132,8 @@ CREATE TABLE `postulacion` (
 --
 
 INSERT INTO `postulacion` (`id_postulacion`, `fecha_po`, `estado_po`, `comentarios_admin`, `id_miembro`, `cantidad_menores`, `trabajo`, `tipo_contrato`, `ingresos_nominales`, `ingresos_familiares`, `observacion_salud`, `constitucion_familiar`, `vivienda_actual`, `gasto_vivienda`, `nivel_educativo`, `hijos_estudiando`, `patrimonio`, `disponibilidad_ayuda`, `motivacion`, `presentado_por`, `referencia_contacto`, `fecha_postulacion`) VALUES
-(1, '2025-09-11', 'pendiente', NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-09-11 02:36:39'),
-(2, NULL, 'pendiente', NULL, 5, 4, 'ingeniero', 'permanente', 0.40, 3424.00, 'no', 'caca', 'culo', 0.37, 'utu', 1, 'casa', 'no', 'no', 'nadie', 'nadie', '2025-09-11 02:48:57'),
-(3, NULL, 'pendiente', NULL, 4, 12, 'ingeniero', 'permanente', 1212.00, 21.00, '231', '23123', '213', 231212.97, 'utu', 12, '2112', '12313', '3213', '13232', '13213', '2025-09-11 03:00:12'),
-(4, NULL, 'pendiente', NULL, 6, 11, 'dwad', 'informal', 21.00, 2313.00, '12312', '3312312', '213321', 31223.00, '12312', 12312, '312', '231312', '12312', '132312', '3213', '2025-09-11 03:02:07');
-
+(1, '2025-01-01', 'aceptada', NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-09-11 02:36:39'),
+(2, '2025-10-22', 'aceptada', NULL, 2, 2, 'Empleado', 'Indefinido', 50000.00, 80000.00, 'Ninguna', 'Nuclear', 'Alquiler', 15000.00, 'Universitario', 2, 'Ahorros', 'Sí', 'Me gustaría mejorar mi calidad de vida y la de mi familia.', 'Ninguno', 'Ninguno', '2025-10-15 04:20:10');
 -- --------------------------------------------------------
 
 --
@@ -164,11 +152,11 @@ CREATE TABLE `unidad_habitacional` (
 
 INSERT INTO `unidad_habitacional` (`id_unidad`, `metros_cuadrados`, `estado_un`) VALUES
 (1, 45.00, 'ocupada'),
-(2, 45.00, 'disponible'),
-(3, 45.00, 'ocupada'),
+(2, 45.00, 'ocupada'),
+(3, 45.00, 'disponible'),
 (4, 45.00, 'disponible'),
 (5, 45.00, 'disponible'),
-(6, 45.00, 'ocupada'),
+(6, 45.00, 'disponible'),
 (7, 45.00, 'disponible'),
 (8, 45.00, 'disponible'),
 (9, 45.00, 'disponible'),
@@ -188,7 +176,7 @@ INSERT INTO `unidad_habitacional` (`id_unidad`, `metros_cuadrados`, `estado_un`)
 (23, 45.00, 'disponible'),
 (24, 45.00, 'disponible'),
 (25, 45.00, 'disponible'),
-(26, 45.00, 'ocupada'),
+(26, 45.00, 'disponible'),
 (27, 45.00, 'disponible'),
 (28, 45.00, 'disponible'),
 (29, 45.00, 'disponible'),
@@ -228,7 +216,7 @@ INSERT INTO `unidad_habitacional` (`id_unidad`, `metros_cuadrados`, `estado_un`)
 (63, 45.00, 'disponible'),
 (64, 45.00, 'disponible'),
 (65, 45.00, 'disponible'),
-(66, 45.00, 'ocupada'),
+(66, 45.00, 'disponible'),
 (67, 45.00, 'disponible'),
 (68, 45.00, 'disponible'),
 (69, 45.00, 'disponible'),
@@ -239,7 +227,7 @@ INSERT INTO `unidad_habitacional` (`id_unidad`, `metros_cuadrados`, `estado_un`)
 (74, 45.00, 'disponible'),
 (75, 45.00, 'disponible'),
 (76, 45.00, 'disponible'),
-(77, 45.00, 'ocupada'),
+(77, 45.00, 'disponible'),
 (78, 45.00, 'disponible'),
 (79, 45.00, 'disponible'),
 (80, 45.00, 'disponible'),
@@ -262,7 +250,7 @@ INSERT INTO `unidad_habitacional` (`id_unidad`, `metros_cuadrados`, `estado_un`)
 (97, 45.00, 'disponible'),
 (98, 45.00, 'disponible'),
 (99, 45.00, 'disponible'),
-(100, 45.00, 'ocupada');
+(100, 45.00, 'disponible');
 
 --
 -- Índices para tablas volcadas
@@ -366,7 +354,6 @@ ALTER TABLE `postulacion`
   ADD CONSTRAINT `fk_postulacion_miembro` FOREIGN KEY (`id_miembro`) REFERENCES `miembro` (`id_miembro`);
 COMMIT;
 
-ALTER TABLE miembro ADD foto_perfil VARCHAR(255) NULL;
 
 SELECT
     m.nombre AS nombre_completo,

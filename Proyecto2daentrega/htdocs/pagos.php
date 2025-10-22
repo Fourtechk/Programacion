@@ -248,29 +248,37 @@ header {
   top: 0;
   left: 0;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start; 
   align-items: center;
   padding: 0 25px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   z-index: 10;
 }
 
-header a {
-  color: #edf1f6;
-  text-decoration: none;
-  font-weight: 600;
-  background: #6ebbe9;
-  padding: 8px 16px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(110, 187, 233, 0.3);
-  transition: all 0.3s ease;
+
+.header-logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; 
 }
 
-header a:hover {
-  background: #2b5f87;
-  color: #fff;
-  box-shadow: 0 0 14px rgba(110, 187, 233, 0.5);
-  transform: translateY(-2px);
+
+.header-logo {
+    height: 50px; 
+    width: auto;
+    border-radius:100%;
+   
+    image-rendering: optimizeQuality; 
+}
+
+
+.header-title {
+    color: #ffffffff; /
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  
+    text-shadow: 0 0 5px rgba(110, 187, 233, 0.7); 
 }
 
 /* ------------------------------------- */
@@ -453,6 +461,15 @@ a:hover {
     color: #fff;
 }
 
+.logout-link {
+    text-decoration: none;
+}
+
+.logout-link:hover {
+    text-decoration: none;
+}
+
+
 /* ======== ANIMACIÓN ======== */
 @keyframes fadeIn {
     from { opacity: 0; }
@@ -498,15 +515,29 @@ a:hover {
         padding: 8px 16px;
     }
 }
+.lateral li {
+    padding: 15px 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.3s ease, color 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    
+    /* === AÑADE ESTA PROPIEDAD CLAVE === */
+    user-select: none; 
+    /* También puedes usar los prefijos para compatibilidad: */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+ */
+}
 </style>
 </head>
 <body>
-    <header>
-        <div class="top-bar">
-            <a href="logout.php">Cerrar sesión</a>
-        </div>
+  <header>
+    <div class="header-logo-container">
+        <img src="logo.jpeg" alt="Logo Cooperativa" class="header-logo">
+        <span class="header-title">Panel Miembro</span>
+    </div>
     </header>
-
     <div class="sidebar">
         <ul class="lateral">
             <li class="activa-menu" data-target="seccion-inicio">🏠 Inicio</li>
@@ -514,6 +545,8 @@ a:hover {
             <li data-target="seccion-horas">⏰ Horas</li>
             <?php if (!empty($user) && $user['admin'] == 1): ?>
                 <li data-target="seccion-admin">⚙️ Administración</li>
+               <li><a href="logout.php" class="logout-link" style="color: #F44336; font-weight: bold;">Cerrar Sesión</a></li>
+
             <?php endif; ?>
         </ul>
     </div>
