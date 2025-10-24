@@ -577,24 +577,25 @@ a:hover {
   <header>
     <div class="header-logo-container">
         <img src="logo.jpeg" alt="Logo Cooperativa" class="header-logo">
-        <span class="header-title">Panel Miembro</span>
     </div>
     </header>
-    <div class="sidebar">
-        <ul class="lateral">
-            <li class="activa-menu" data-target="seccion-inicio">🏠 Inicio</li>
-            <li data-target="seccion-pagos">💳 Pagos</li>
-            <li data-target="seccion-horas">⏰ Horas</li>
-            <?php if (!empty($user) && $user['admin'] == 1): ?>
-                <li data-target="seccion-admin">⚙️ Administración</li>
-         <form method="post" action="logout.php" class="logout-form">
+   <div class="sidebar">
+    <ul class="lateral">
+        <li class="activa-menu" data-target="seccion-inicio">🏠 Inicio</li>
+        <li data-target="seccion-pagos">💳 Pagos</li>
+        <li data-target="seccion-horas">⏰ Horas</li>
+        
+        <?php if (!empty($user) && $user['admin'] == 1): ?>
+            <li data-target="seccion-admin">⚙️ Administración</li>
+        <?php endif; ?>
+        
+        <form method="post" action="logout.php" class="logout-form">
             <button type="submit" class="logout-btn">
                 Cerrar Sesión
             </button>
         </form>
-            <?php endif; ?>
-        </ul>
-    </div>
+    </ul>
+</div>
     
     <main class="main-container">
        
