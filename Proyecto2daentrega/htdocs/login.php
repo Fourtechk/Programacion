@@ -82,6 +82,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       height: 100vh;
       margin: 0;
       overflow: hidden;
+      user-select: auto; /* O anulas la herencia en inputs */
+    -webkit-user-select: auto;
+    caret-color: transparent;
     }
 
     header {
@@ -118,6 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       text-align: center;
       animation: fadeIn 0.6s ease-out;
+
     }
 
     @keyframes fadeIn {
@@ -142,6 +146,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       font-size: 15px;
       outline: none;
       transition: all 0.3s ease;
+      user-select: auto; 
+    -webkit-user-select: auto;
+  
     }
 
     input:focus {
@@ -162,7 +169,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       font-size: 16px;
       cursor: pointer;
       transition: all 0.3s ease;
-    }
+      user-select: none; 
+    -webkit-user-select: none; 
+}
+  
 
     button:hover {
       background: linear-gradient(135deg, #2b5f87, #6ebbe9);
@@ -200,6 +210,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       30%, 50%, 70% { transform: translateX(-4px); }
       40%, 60% { transform: translateX(4px); }
     }
+
+ 
+
   </style>
 </head>
 <body>

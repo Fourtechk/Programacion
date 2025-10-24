@@ -461,14 +461,56 @@ a:hover {
     color: #fff;
 }
 
-.logout-link {
-    text-decoration: none;
+/* ------------------------------------- */
+/* ======== NUEVO BOTÓN CERRAR SESIÓN (FORMULARIO) ======== */
+/* ------------------------------------- */
+
+.logout-form {
+    /* El formulario debe actuar como un elemento de menú */
+    display: block;
+    padding: 0;
+    margin: 0;
 }
 
-.logout-link:hover {
-    text-decoration: none;
+.logout-btn {
+    /* Hereda los estilos visuales del menú LI */
+    display: block; 
+    width: 100%; /* Ocupa el 100% del ancho del sidebar */
+    text-align: left;
+      box-shadow: none;
+    /* Copia el padding de los otros LI */
+    padding: 15px 25px; 
+    
+    /* Estilos visuales */
+    background: transparent; /* Fondo transparente por defecto */
+    border: none;
+    cursor: pointer;
+    font-size: 16px; /* Ajusta al tamaño de fuente de tu menú */
+    font-weight: 500;
+    border-radius: 0; /* Sin bordes redondeados */
+    
+    
+    /* El color y la transición */
+    color: #F44336; /* Color rojo para el texto */
+    transition: background 0.3s ease, color 0.3s ease;
+    
+    /* Para evitar la selección de texto al hacer doble clic rápido */
+    user-select: none; 
+    -webkit-user-select: none; 
 }
 
+/* Efecto Hover para todo el botón */
+.logout-btn:hover {
+    background: rgba(244, 67, 54, 0.2); /* Fondo de hover rojo claro */
+    color: #F44336;
+    transform: none; /* Asegura que no se mueva */
+    box-shadow: none; /* Elimina sombras de botón estándar si existen */
+}
+
+
+.logout-btn:active {
+    background: rgba(244, 67, 54, 0.3); /* Un poco más oscuro al presionar */
+}
 
 /* ======== ANIMACIÓN ======== */
 @keyframes fadeIn {
@@ -545,8 +587,11 @@ a:hover {
             <li data-target="seccion-horas">⏰ Horas</li>
             <?php if (!empty($user) && $user['admin'] == 1): ?>
                 <li data-target="seccion-admin">⚙️ Administración</li>
-               <li><a href="logout.php" class="logout-link" style="color: #F44336; font-weight: bold;">Cerrar Sesión</a></li>
-
+         <form method="post" action="logout.php" class="logout-form">
+            <button type="submit" class="logout-btn">
+                Cerrar Sesión
+            </button>
+        </form>
             <?php endif; ?>
         </ul>
     </div>

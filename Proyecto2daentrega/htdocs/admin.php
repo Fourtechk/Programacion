@@ -350,6 +350,59 @@ header {
 }
 
 /* ------------------------------------- */
+/* ======== NUEVO BOTÓN CERRAR SESIÓN (FORMULARIO) ======== */
+/* ------------------------------------- */
+
+.logout-form {
+    /* El formulario debe actuar como un elemento de menú */
+    display: block;
+    padding: 0;
+    margin: 0;
+    
+}
+
+.logout-btn {
+    /* Hereda los estilos visuales del menú LI */
+    display: block; 
+    width: 100%; /* Ocupa el 100% del ancho del sidebar */
+    text-align: left;
+      box-shadow: none;
+    /* Copia el padding de los otros LI */
+    padding: 15px 25px; 
+    
+    /* Estilos visuales */
+    background: transparent; /* Fondo transparente por defecto */
+    border: none;
+    cursor: pointer;
+    font-size: 16px; /* Ajusta al tamaño de fuente de tu menú */
+    font-weight: 500;
+    border-radius: 0; /* Sin bordes redondeados */
+    
+    
+    /* El color y la transición */
+    color: #F44336; /* Color rojo para el texto */
+    transition: background 0.3s ease, color 0.3s ease;
+   
+
+    
+    /* Para evitar la selección de texto al hacer doble clic rápido */
+    user-select: none; 
+    -webkit-user-select: none; 
+}
+
+/* Efecto Hover para todo el botón */
+.logout-btn:hover {
+    background: rgba(244, 67, 54, 0.2); /* Fondo de hover rojo claro */
+    color: #F44336;
+    transform: none; /* Asegura que no se mueva */
+    box-shadow: none; /* Elimina sombras de botón estándar si existen */
+}
+
+
+.logout-btn:active {
+    background: rgba(244, 67, 54, 0.3); /* Un poco más oscuro al presionar */
+}
+/* ------------------------------------- */
 /* ======== NAVEGACIÓN LATERAL (IZQUIERDA) ======== */
 /* ------------------------------------- */
 
@@ -363,11 +416,13 @@ header {
     height: 100vh;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3); 
     z-index: 9;
+     font-weight: 500;
 }
 
 .lateral {
     list-style: none;
     padding: 0;
+    
 }
 
 .lateral li {
@@ -386,6 +441,7 @@ header {
 
 .lateral li:hover {
     background: rgba(110, 187, 233, 0.1);
+    
 }
 
 .lateral li.activa-menu {
@@ -609,6 +665,7 @@ td form {
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+ */
 }
+
     </style>
 </head>
 <body>
@@ -626,8 +683,11 @@ td form {
             <li class="<?= $view === 'horas' ? 'activa-menu' : '' ?>"><a href="admin.php?view=horas">⏰ Horas</a></li>
             <li class="<?= $view === 'postulaciones' ? 'activa-menu' : '' ?>"><a href="admin.php?view=postulaciones">📄 Postulaciones</a></li>
             <li><a href="pagos.php">🚪 Área Miembro</a></li>
-            <li><a href="logout.php" style="color: #F44336; font-weight: bold;">Cerrar Sesión</a></li>
-        </ul>
+               <form method="post" action="logout.php" class="logout-form">
+            <button type="submit" class="logout-btn">
+                Cerrar Sesión
+            </button>
+        </form>
     </div>
 
     <div class="main-content">
