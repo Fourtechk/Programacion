@@ -1,0 +1,9 @@
+FROM php:8.2-apache
+
+# Copia tu código al contenedor
+COPY ./src /var/www/html/
+
+# Habilita extensiones necesarias (mysqli, pdo_mysql, etc.)
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+EXPOSE 80
