@@ -13,6 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
     $nombre = trim($_POST["nombre"]);
     $email = trim($_POST["email"]);
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
+    $fecha_nacimiento = $_POST["fecha_nacimiento"]; // 🟢 nuevo campo
 
     // Verificar si el email ya existe
     $stmt = $conexion->prepare("SELECT id_miembro FROM miembro WHERE email = ?");
@@ -26,17 +27,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
     if ($id_existente) {
         $id_miembro = $id_existente;
     } else {
-        // Insertar nuevo miembro
-        $stmt = $conexion->prepare("INSERT INTO miembro (nombre, email, password) VALUES (?, ?, ?)");
+        // 🟢 Insertar nuevo miembro con fecha de nacimiento
+        $stmt = $conexion->prepare("INSERT INTO miembro (nombre, email, password, fecha_nacimiento) VALUES (?, ?, ?, ?)");
         if ($stmt === false) { die("Error INSERT miembro: " . $conexion->error); }
-        $stmt->bind_param("sss", $nombre, $email, $password);
+        $stmt->bind_param("ssss", $nombre, $email, $password, $fecha_nacimiento);
         if (!$stmt->execute()) {
             die("Error al registrar miembro: " . $stmt->error);
         }
         $id_miembro = $stmt->insert_id;
         $stmt->close();
     }
+$stmt = $conexion->prepare("INSERT INTO calendario (titulo, descripcion, fecha_evento, creado_por) VALUES (?, ?, ?, ?)");
+if ($stmt === false) { die("Error INSERT calendario: " . $conexion->error); }
 
+$titulo = "Cumpleaños de $nombre";
+$descripcion = "Fecha de nacimiento de $nombre";
+$stmt->bind_param("sssi", $titulo, $descripcion, $fecha_nacimiento, $id_miembro);
+$stmt->execute();
+$stmt->close();
     // Campos de postulación
     $cantidad_menores = intval($_POST["cantidad_menores"] ?? 0);
     $trabajo = $_POST["trabajo"] ?? '';
@@ -229,6 +237,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !empty($_POST)) {
 
        <label>Contraseña</label> 
        <input type="password" name="password"> 
+
+       <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+       <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
 
        <label>Cantidad de menores a cargo:</label> 
        <input type="number" name="cantidad_menores" required>

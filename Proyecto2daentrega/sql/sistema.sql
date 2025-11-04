@@ -57,6 +57,7 @@ CREATE TABLE `miembro` (
   `nombre` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `fecha_nacimiento` date DEFAULT NULL,
   `aprobado` tinyint(1) DEFAULT 0,
   `es_miembro` tinyint(1) DEFAULT 0,
   `admin` tinyint(1) DEFAULT 0,
@@ -70,9 +71,9 @@ CREATE TABLE `miembro` (
 -- Volcado de datos para la tabla `miembro`
 --
 
-INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `aprobado`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`, `foto_perfil`) VALUES
-(1, 'Administrador General', 'admin@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 1, 'activo', 1, '2025-01-01', 'perfiles/perfil_1_1761134331.jpg'),
-(2, 'Miembro', 'miembro@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', 1, 1, 0, 'activo', 2, '2025-10-22', 'perfiles/perfil_8_1761134422.jpg');
+INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `fecha_nacimiento`, `aprobado`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`, `foto_perfil`) VALUES
+(1, 'Administrador General', 'admin@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', '2000-11-20', 1, 1, 1, 'activo', 1, '2025-01-01', 'perfiles/perfil_8_1761134422.jpg'),
+(2, 'Miembro', 'miembro@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', '2007-09-13', 1, 1, 0, 'activo', 2, '2025-10-22', 'perfiles/perfil_8_1761134422.jpg');
 
 --
 -- Estructura de tabla para la tabla `pago`
@@ -252,10 +253,22 @@ INSERT INTO `unidad_habitacional` (`id_unidad`, `metros_cuadrados`, `estado_un`)
 (99, 45.00, 'disponible'),
 (100, 45.00, 'disponible');
 
---
--- Índices para tablas volcadas
---
+CREATE TABLE calendario (
+    id_evento INT(11) NOT NULL AUTO_INCREMENT,
+    titulo VARCHAR(255) NOT NULL,
+    descripcion TEXT NULL DEFAULT NULL,
+    fecha_evento DATE NOT NULL,
+    creado_por INT(11) NULL DEFAULT NULL,
+    PRIMARY KEY (id_evento)
+);
 
+CREATE TABLE foro (
+    id_foro INT(11) NOT NULL AUTO_INCREMENT,
+    id_miembro INT(11) NOT NULL,
+    mensaje TEXT NOT NULL,
+    fecha_publicacion DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id_foro)
+);
 --
 -- Indices de la tabla `horas`
 --
@@ -353,7 +366,6 @@ ALTER TABLE `pago`
 ALTER TABLE `postulacion`
   ADD CONSTRAINT `fk_postulacion_miembro` FOREIGN KEY (`id_miembro`) REFERENCES `miembro` (`id_miembro`);
 COMMIT;
-
 
 SELECT
     m.nombre AS nombre_completo,

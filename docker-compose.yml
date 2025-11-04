@@ -1,28 +1,25 @@
-version: '3.9'
+version: '3.8'
 
 services:
-  web:
+  app:
     build: .
-    container_name: sistema_web
+    container_name: sistema_app
     ports:
       - "8080:80"
     volumes:
       - ./htdocs:/var/www/html
+    environment:
+      MYSQL_HOST: 192.168.5.50
+      MYSQL_USER: facundo.figuera
+      MYSQL_PASSWORD: 56812417
+      MYSQL_DATABASE: sistema
+    restart: unless-stopped
 
-    depends_on:
-      - db
-
-  db:
-  image: mysql:8.0
-  container_name: sistema_db
-  environment:
-    MYSQL_ROOT_PASSWORD: root
-    MYSQL_DATABASE: sistema
-    MYSQL_USER: admin
-    MYSQL_PASSWORD: 1234
-  volumes:
-    - db_data:/var/lib/mysql
-    - ./sql:/docker-entrypoint-initdb.d
-
-volumes:
-  db_data:
+  backup:
+    build: .
+    container_name: sistema_backup
+    ports:
+      - "8081:80"
+    volumes:
+      - ./htdocs:/var/www/html
+    restart: always

@@ -16,11 +16,10 @@ if (!isset($_SESSION["id"])) {
 
 $id = $_SESSION["id"];
 $mensajeHoras = "";
-$mensajeFoto = ""; // Nueva variable para mensajes de la foto
+$mensajeFoto = "";
 
 // =========================================================================
-// === CONSULTA SQL (SE MANTIENE, usando nombre AS nombre_completo) ===
-// =========================================================================
+// === CONSULTA USUARIO ===
 $sql = "
     SELECT 
         m.es_miembro, 
@@ -28,6 +27,7 @@ $sql = "
         m.nombre AS nombre_completo, 
         m.email, 
         m.id_unidad, 
+        m.fecha_nacimiento,
         m.fecha_ingreso AS fecha_socio,
         m.foto_perfil AS foto_perfil_url
     FROM 
@@ -47,15 +47,85 @@ if (!$user || ($user["es_miembro"] != 1 && $user["admin"] != 1)) {
 }
 
 // =========================================================================
-// === NUEVO BLOQUE: SUBIDA Y ACTUALIZACIÓN DE FOTO DE PERFIL ===
-// =========================================================================
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["subir_foto_perfil"], $_POST["csrf"])) {
-    $csrf_post = $_POST['csrf'];
-    $csrf_session = $_SESSION['csrf'] ?? '';
-    
-    if (!is_string($csrf_post) || !is_string($csrf_session) || !hash_equals($csrf_session, $csrf_post)) {
-        die("Token CSRF inválido");
+// === PUBLICAR MENSAJE EN FORO ===
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["publicar_foro"], $_POST["csrf"])) {
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
+
+    $mensaje = trim($_POST['mensaje']);
+    if ($mensaje !== "") {
+        $insertForo = $conexion->prepare("INSERT INTO foro (id_miembro, mensaje) VALUES (?, ?)");
+        $insertForo->bind_param("is", $id, $mensaje);
+        $insertForo->execute();
+
+        header("Location: pagos.php#seccion-foro");
+        exit;
     }
+}
+
+// =========================================================================
+// === AGREGAR EVENTO (SOLO ADMIN) ===
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["agregar_evento"], $_POST["csrf"])) {
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
+    if ($user['admin'] != 1) die("No autorizado");
+
+    $titulo = trim($_POST['titulo']);
+    $descripcion = trim($_POST['descripcion'] ?? '');
+    $fecha_evento = $_POST['fecha_evento'] ?? '';
+
+    if ($titulo !== "" && $fecha_evento !== "") {
+        $insertEvento = $conexion->prepare("
+            INSERT INTO calendario (titulo, descripcion, fecha_evento, creado_por)
+            VALUES (?, ?, ?, ?)
+        ");
+        $insertEvento->bind_param("sssi", $titulo, $descripcion, $fecha_evento, $id);
+        $insertEvento->execute();
+        header("Location: pagos.php?evento=ok");
+        exit;
+    }
+}
+
+// =========================================================================
+// === LISTAR EVENTOS + CUMPLEAÑOS ===
+if (isset($_GET['accion']) && $_GET['accion'] === 'cumpleanos') {
+    header('Content-Type: application/json');
+
+    $eventos = [];
+
+    // 1️⃣ Eventos normales
+    $resultEventos = $conexion->query("SELECT titulo, descripcion, fecha_evento FROM calendario ORDER BY fecha_evento ASC");
+    while($fila = $resultEventos->fetch_assoc()) {
+        $eventos[] = [
+            'title' => $fila['titulo'],
+            'start' => $fila['fecha_evento'],
+            'description' => $fila['descripcion'],
+            'allDay' => true,
+            'color' => '#6ebbe9', // eventos normales
+        ];
+    }
+
+    // 2️⃣ Cumpleaños recurrentes
+    $queryCumples = $conexion->query("SELECT nombre AS nombre_completo, fecha_nacimiento FROM miembro WHERE fecha_nacimiento IS NOT NULL");
+    while($row = $queryCumples->fetch_assoc()) {
+        $eventos[] = [
+            'title' => "🎂 " . $row['nombre_completo'],
+            'rrule' => [
+                'freq' => 'yearly',
+                'bymonthday' => (int)date('d', strtotime($row['fecha_nacimiento'])),
+                'bymonth' => (int)date('m', strtotime($row['fecha_nacimiento']))
+            ],
+            'allDay' => true,
+            'color' => '#f7a500', // cumpleaños
+        ];
+    }
+
+    echo json_encode($eventos);
+    exit;
+}
+
+// =========================================================================
+// === SUBIDA Y ACTUALIZACIÓN DE FOTO DE PERFIL ===
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["subir_foto_perfil"], $_POST["csrf"])) {
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
 
     if (isset($_FILES["foto_perfil"]) && $_FILES["foto_perfil"]["error"] === 0) {
         $allowed = ['jpg','jpeg','png'];
@@ -63,34 +133,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["subir_foto_perfil"], 
 
         if (!in_array($ext, $allowed)) {
             $mensajeFoto = "❌ Solo se permiten archivos JPG, JPEG o PNG.";
-        } elseif ($_FILES["foto_perfil"]["size"] > 2000000) { // Límite de 2MB
+        } elseif ($_FILES["foto_perfil"]["size"] > 2000000) {
             $mensajeFoto = "❌ El archivo es demasiado grande (máximo 2MB).";
         } else {
-            // Preparar directorio y ruta
             if (!is_dir("perfiles")) mkdir("perfiles", 0755);
             $nombre_archivo = "perfil_{$id}_".time().".".$ext;
             $ruta = "perfiles/" . $nombre_archivo;
-            
-            if (move_uploaded_file($_FILES["foto_perfil"]["tmp_name"], $ruta)) {
-                
-                // Borrar foto anterior (opcional, para liberar espacio)
-                if (!empty($user['foto_perfil_url']) && file_exists($user['foto_perfil_url'])) {
-                    unlink($user['foto_perfil_url']);
-                }
 
-                // Actualizar DB
+            if (move_uploaded_file($_FILES["foto_perfil"]["tmp_name"], $ruta)) {
+                if (!empty($user['foto_perfil_url']) && file_exists($user['foto_perfil_url'])) unlink($user['foto_perfil_url']);
                 $updateFoto = $conexion->prepare("UPDATE miembro SET foto_perfil = ? WHERE id_miembro = ?");
                 $updateFoto->bind_param("si", $ruta, $id);
                 $updateFoto->execute();
-                
                 $mensajeFoto = "Foto subida correctamente. ✅";
-                
-                // Refrescar los datos del usuario en la sesión/variable para que la vea inmediatamente
-                $user['foto_perfil_url'] = $ruta; 
-                
+                $user['foto_perfil_url'] = $ruta;
                 header("Location: pagos.php?foto=ok");
-                exit; 
-
+                exit;
             } else {
                 $mensajeFoto = "❌ Error al mover el archivo subido.";
             }
@@ -100,8 +158,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["subir_foto_perfil"], 
     }
 }
 
-
-// Verificar si existe fila en horas
+// =========================================================================
+// === VERIFICAR HORAS DEL USUARIO ===
 $checkHoras = $conexion->prepare("SELECT id_horas FROM horas WHERE id_miembro = ?");
 $checkHoras->bind_param("i", $id);
 $checkHoras->execute();
@@ -113,35 +171,30 @@ if ($resHoras->num_rows === 0) {
     $insertHoras->execute();
 }
 
-// Traer comprobantes
+// =========================================================================
+// === TRAER COMPROBANTES ===
 $stmt = $conexion->prepare("SELECT * FROM pago WHERE id_miembro=? ORDER BY fecha_p DESC");
 $stmt->bind_param("i", $id);
 $stmt->execute();
 $comprobantes = $stmt->get_result();
 
-// Traer horas del miembro
+// =========================================================================
+// === TRAER HORAS ===
 $queryHoras = $conexion->prepare("SELECT * FROM horas WHERE id_miembro = ?");
 $queryHoras->bind_param("i", $id);
 $queryHoras->execute();
 $resultHoras = $queryHoras->get_result();
 $horas = $resultHoras ? $resultHoras->fetch_assoc() : [];
 
-
-// === BLOQUE 1: CAMBIO DE ESTADO DE PAGO ===
+// =========================================================================
+// === CAMBIO DE ESTADO DE PAGO ===
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['estado'], $_POST['csrf']) && !isset($_POST['guardar_asistencia'])) {
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
+
     $id_pago = intval($_POST['id']);
     $estado = $_POST['estado'];
-    $csrf_post = $_POST['csrf'];
-    $csrf_session = $_SESSION['csrf'] ?? '';
-
-    if (!is_string($csrf_post) || !is_string($csrf_session) || !hash_equals($csrf_session, $csrf_post)) {
-        die("Token CSRF inválido");
-    }
-
     $valid = ['aprobado', 'rechazado'];
-    if (!in_array($estado, $valid, true)) {
-        die("Estado inválido");
-    }
+    if (!in_array($estado, $valid, true)) die("Estado inválido");
 
     $stmt = $conexion->prepare("UPDATE pago SET estado_pa = ? WHERE id_pago = ?");
     $stmt->bind_param("si", $estado, $id_pago);
@@ -151,15 +204,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['estado'
     exit;
 }
 
-
-// === BLOQUE 2: REGISTRO DE ASISTENCIA ===
+// =========================================================================
+// === REGISTRO DE ASISTENCIA ===
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"], $_POST["csrf"])) {
-    $csrf_post = $_POST['csrf'];
-    $csrf_session = $_SESSION['csrf'] ?? '';
-
-    if (!is_string($csrf_post) || !is_string($csrf_session) || !hash_equals($csrf_session, $csrf_post)) {
-        die("Token CSRF inválido");
-    }
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
 
     $asistio = intval($_POST["asistio"]);
     $registro = "";
@@ -170,56 +218,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
         $registro = "asistio=1;horas={$horasRealizadas};actividad={$actividad}";
 
         if ($horasRealizadas > 0) {
-            $updateHoras = $conexion->prepare("
-                UPDATE horas 
-                SET horas_pendientes = horas_pendientes + ? 
-                WHERE id_miembro = ?
-            ");
+            $updateHoras = $conexion->prepare("UPDATE horas SET horas_pendientes = horas_pendientes + ? WHERE id_miembro = ?");
             $updateHoras->bind_param("ii", $horasRealizadas, $id);
             $updateHoras->execute();
         }
 
     } else {
         $justificativo = trim($_POST["justificativo_texto"]);
-
         if (isset($_FILES["justificativo_file"]) && $_FILES["justificativo_file"]["error"] === 0) {
             $allowed = ['pdf','jpg','jpeg','png'];
             $ext = strtolower(pathinfo($_FILES["justificativo_file"]["name"], PATHINFO_EXTENSION));
             if (in_array($ext, $allowed)) {
                 if (!is_dir("justificativos")) mkdir("justificativos", 0755);
-                $ruta = "justificativos/just_{$id}_".time().".".$ext;
-                move_uploaded_file($_FILES["justificativo_file"]["tmp_name"], $ruta);
-                $justificativo .= ($justificativo ? " " : "") . $ruta;
+                $nombreArchivo = "justificativo_{$id}_".time().".".$ext;
+                $rutaArchivo = "justificativos/" . $nombreArchivo;
+                move_uploaded_file($_FILES["justificativo_file"]["tmp_name"], $rutaArchivo);
+                $justificativo .= " | Archivo: $rutaArchivo";
             }
         }
         $registro = "asistio=0;justificativo={$justificativo}";
     }
 
-    if ($registro !== "") {
-        $updateJust = $conexion->prepare("
-            UPDATE horas 
-            SET justificativos = CONCAT_WS('|', justificativos, ?) 
-            WHERE id_miembro = ?
-        ");
-        $updateJust->bind_param("si", $registro, $id);
-        $updateJust->execute();
-    }
+    $stmtInsertAsistencia = $conexion->prepare("INSERT INTO asistencia (id_miembro, registro) VALUES (?, ?)");
+    $stmtInsertAsistencia->bind_param("is", $id, $registro);
+    $stmtInsertAsistencia->execute();
 
-    $mensajeHoras .= "Registro guardado correctamente ✅";
-
-    $queryHoras->execute();
-    $horas = $queryHoras->get_result()->fetch_assoc();
-
-    header("Location: pagos.php?registro=ok");
+    header("Location: pagos.php?asistencia=ok");
     exit;
 }
+
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pagos y Horas - Cooperativa</title>
+     <title>Pagos y Horas - Cooperativa</title>
+      <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+
     <style>
 /* ======== ESTILO GENERAL ======== */
 * {
@@ -571,7 +609,71 @@ a:hover {
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* IE10+ */
 }
+
+#calendar {
+  width: 95%;
+  max-width: 1200px;
+  margin: 40px auto;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  min-height: 700px;
+  height: auto !important;
+  overflow: hidden; /* 🔥 sin scroll */
+  box-sizing: border-box;
+}
+/* FullCalendar interno */
+.fc {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Cabecera del calendario */
+.fc-toolbar {
+  background-color: #007bff;
+  border-radius: 10px;
+  padding: 10px;
+  color: white;
+}
+.fc-toolbar-title {
+  color: white !important;
+  font-size: 1.8rem !important;
+  font-weight: bold;
+}
+
+/* Botones */
+.fc-button-primary {
+  background-color: #0056b3 !important;
+  border: none !important;
+  border-radius: 6px !important;
+}
+.fc-button-primary:hover {
+  background-color: #003f88 !important;
+}
+
+/* Días y hover */
+.fc-daygrid-day {
+  background-color: #fafafa;
+  transition: background-color 0.25s ease;
+}
+.fc-daygrid-day:hover {
+  background-color: #e7f1ff;
+}
+
+/* Evento */
+.fc-event {
+  background-color: #17a2b8 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  color: white !important;
+  font-size: 0.9rem;
+  padding: 2px 4px;
+}
+.activa { display:block; }
+.seccion { display:none; }
+.activa-menu { font-weight:bold; }
 </style>
+
 </head>
 <body>
   <header>
@@ -584,6 +686,9 @@ a:hover {
         <li class="activa-menu" data-target="seccion-inicio">🏠 Inicio</li>
         <li data-target="seccion-pagos">💳 Pagos</li>
         <li data-target="seccion-horas">⏰ Horas</li>
+        <li data-target="seccion-foro">💬 Foro</li>
+        <li data-target="seccion-calendario">📅 Calendario</li>
+
         
         <?php if (!empty($user) && $user['admin'] == 1): ?>
             <li data-target="seccion-admin">⚙️ Administración</li>
@@ -665,7 +770,16 @@ a:hover {
                     <em style="color: #888; float: right;">No asignada</em>
                 <?php endif; ?>
             </p>
-        
+
+       <p style="margin-bottom: 8px;">
+    <strong style="color: #6ebbe9;">Fecha de nacimiento:</strong> 
+     <?php if (!empty($user['fecha_nacimiento'])): ?>
+            <span style="float: right; color: #fff;"><?= htmlspecialchars(date('d/m/Y', strtotime($user['fecha_nacimiento']))) ?></span>
+        <?php else: ?>
+            <em style="color: #888; float: right;">Dato no disponible</em>
+        <?php endif; ?>
+</p>
+
             <p style="margin-bottom: 0;">
                 <strong style="color: #6ebbe9;">Socio Desde:</strong>
                 <?php if (!empty($user['fecha_socio'])): ?>
@@ -814,45 +928,152 @@ a:hover {
                 </div>
             </div>
             <?php endif; ?>
+<div id="seccion-foro" class="seccion">
+  <div class="form-box">
+    <h2>💬 Foro Comunitario</h2>
 
-        </div> </main>
+    <!-- Formulario para publicar -->
+    <form method="POST" action="">
+        <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
+        <textarea name="mensaje" placeholder="Escribe tu mensaje..." required></textarea>
+        <button type="submit" name="publicar_foro" class="postularme">Publicar</button>
+    </form>
 
-    <script>
-        // Código JavaScript sacado de la imagen
+    <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.2);">
 
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log("Script cargado");
+    <!-- Mostrar mensajes -->
+    <h3>Mensajes recientes</h3>
+    <div style="max-height: 400px; overflow-y: auto;">
 
-            // 🍕 Navegación entre secciones
-            const items = document.querySelectorAll(".lateral li");
-            const secciones = document.querySelectorAll(".seccion");
+      <?php
+      $foro = $conexion->query("
+        SELECT f.*, m.nombre AS autor 
+        FROM foro f 
+        JOIN miembro m ON f.id_miembro = m.id_miembro 
+        ORDER BY f.fecha_publicacion DESC
+      ");
+      if ($foro->num_rows > 0):
+          while ($fila = $foro->fetch_assoc()):
+      ?>
+          <div style="margin-bottom:15px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">
+              <strong style="color:#6ebbe9;"><?= htmlspecialchars($fila['autor']) ?></strong> 
+              <span style="color:#aaa; font-size:12px;">
+                (<?= date("d/m/Y H:i", strtotime($fila['fecha_publicacion'])) ?>)
+              </span>
+              <p style="margin-top:5px;"><?= nl2br(htmlspecialchars($fila['mensaje'])) ?></p>
+          </div>
+      <?php
+          endwhile;
+      else:
+          echo "<p><em>No hay mensajes aún.</em></p>";
+      endif;
+      ?>
+    </div>
+  </div>
+</div>
 
-            items.forEach(item => {
-                item.addEventListener("click", () => {
-                    // 1. Quitar la clase 'activa' y 'activa-menu' de todos
-                    secciones.forEach(sec => sec.classList.remove("activa"));
-                    items.forEach(i => i.classList.remove("activa-menu")); // Desactivar menú anterior
+<!-- ==================== SECCIÓN CALENDARIO ==================== -->
+<div id="seccion-calendario" class="seccion">
+  <div class="form-box">
+    <h2>📅 Calendario de Eventos</h2>
 
-                    // 2. Obtener la sección de destino
-                    const targetId = item.dataset.target; // Obtiene el valor de data-target
-                    const target = document.getElementById(targetId);
+    <?php if ($user['admin'] == 1): ?>
+      <form method="POST" action="">
+          <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
+          <input type="text" name="titulo" placeholder="Título del evento" required>
+          <textarea name="descripcion" placeholder="Descripción (opcional)"></textarea>
+          <label>Fecha del evento:</label>
+          <input type="date" name="fecha_evento" required>
+          <button type="submit" name="agregar_evento" class="postularme">Agregar evento</button>
+      </form>
+      <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.2);">
+    <?php endif; ?>
 
-                    // 3. Activar la sección y el elemento del menú
-                    if (target) {
-                        target.classList.add("activa");
-                        item.classList.add("activa-menu"); // Activar menú actual
-                    }
-                });
-            });
-            
-            // Asegurar que la primera sección se muestre al cargar
-            const primeraSeccion = document.querySelector('.seccion');
-            const primerMenuItem = document.querySelector('.lateral li');
-            if(primeraSeccion && primerMenuItem) {
-                primeraSeccion.classList.add('activa');
-                primerMenuItem.classList.add('activa-menu');
+    <div id="calendar" style="max-width: 900px; margin: 0 auto; background: transparent; box-shadow: none;"></div>
+  </div>
+</div>
+</div> 
+</main>
+
+<script>             
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("✅ Script principal cargado");
+
+    const items = document.querySelectorAll(".lateral li");
+    const secciones = document.querySelectorAll(".seccion");
+    let calendar; // variable global del calendario
+
+    // 🗓️ Función para inicializar el calendario
+    function inicializarCalendario() {
+        const calendarEl = document.getElementById('calendar');
+        if (!calendarEl) return;
+
+        // Evitar múltiples instancias
+        if (calendar) {
+            calendar.destroy();
+        }
+
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'es',
+            height: 'auto',
+            expandRows: true,
+            contentHeight: 'auto',
+            events: 'pagos.php?action=listar_eventos', // 🔥 carga desde el mismo PHP
+            eventColor: '#3a87ad',
+            eventTextColor: '#fff',
+            eventDisplay: 'block',
+            eventDidMount: (info) => {
+                if (info.event.extendedProps.description) {
+                    info.el.setAttribute('title', info.event.extendedProps.description);
+                }
             }
         });
-    </script>
+
+        calendar.render();
+
+        // 🔥 Asegurar render correcto cuando la sección aparece
+        setTimeout(() => {
+            calendar.updateSize();
+            calendar.render();
+        }, 200);
+    }
+
+    // 🔹 Activar secciones
+    function activarSeccion(id) {
+        secciones.forEach(sec => sec.classList.remove("activa"));
+        items.forEach(i => i.classList.remove("activa-menu"));
+
+        const target = document.getElementById(id);
+        const menuItem = document.querySelector(`.lateral li[data-target="${id}"]`);
+
+        if (target) target.classList.add("activa");
+        if (menuItem) menuItem.classList.add("activa-menu");
+
+        // Si es la sección del calendario
+        if (id === "seccion-calendario") {
+            setTimeout(inicializarCalendario, 150);
+        }
+    }
+
+    // 🔹 Click en menú lateral
+    items.forEach(item => {
+        item.addEventListener("click", (e) => {
+            e.preventDefault();
+            const targetId = item.dataset.target;
+            activarSeccion(targetId);
+            history.replaceState(null, null, "#" + targetId);
+        });
+    });
+
+    // 🔹 Detectar hash o cargar inicio
+    const hash = window.location.hash;
+    if (hash && document.querySelector(hash)) {
+        activarSeccion(hash.replace("#", ""));
+    } else {
+        activarSeccion("seccion-inicio");
+    }
+});
+</script>
 </body>
 </html>
