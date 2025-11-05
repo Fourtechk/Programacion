@@ -46,22 +46,169 @@ if (!$user || ($user["es_miembro"] != 1 && $user["admin"] != 1)) {
     exit();
 }
 
-// =========================================================================
-// === PUBLICAR MENSAJE EN FORO ===
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["publicar_foro"], $_POST["csrf"])) {
-    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
+if (isset($_GET['action']) && $_GET['action'] === 'listar_foro') {
 
-    $mensaje = trim($_POST['mensaje']);
-    if ($mensaje !== "") {
-        $insertForo = $conexion->prepare("INSERT INTO foro (id_miembro, mensaje) VALUES (?, ?)");
-        $insertForo->bind_param("is", $id, $mensaje);
-        $insertForo->execute();
+    // Evitar romper la carga normal del sitio
+    if (
+        isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+    ) {
+        header('Content-Type: text/html; charset=utf-8');
 
-        header("Location: pagos.php#seccion-foro");
+        // 🔹 Cargar los mensajes del foro con el nombre del autor
+        $mensajes = $conexion->query("
+            SELECT f.id, f.titulo, f.mensaje, f.fecha, m.nombre
+            FROM foro f
+            JOIN miembro m ON f.usuario_id = m.id_miembro
+            ORDER BY f.fecha DESC
+        ");
+
+        if ($mensajes && $mensajes->num_rows > 0) {
+            while ($row = $mensajes->fetch_assoc()) {
+                echo "<div class='card mb-3 p-3'>";
+                echo "<h5>" . htmlspecialchars($row['titulo']) . "</h5>";
+                echo "<p>" . nl2br(htmlspecialchars($row['mensaje'])) . "</p>";
+                echo "<small>Por " . htmlspecialchars($row['nombre']) . " el " . $row['fecha'] . "</small>";
+
+                // 🔹 Respuestas al mensaje (tabla foro_respuestas)
+                $respuestas = $conexion->prepare("
+                    SELECT r.respuesta, r.fecha, m.nombre
+                    FROM foro_respuestas r
+                    JOIN miembro m ON r.usuario_id = m.id_miembro
+                    WHERE r.foro_id = ?
+                    ORDER BY r.fecha ASC
+                ");
+                $respuestas->bind_param("i", $row['id']);
+                $respuestas->execute();
+                $res = $respuestas->get_result();
+
+                echo "<div class='mt-3 ms-3 border-start ps-3'>";
+                if ($res && $res->num_rows > 0) {
+                    while ($r = $res->fetch_assoc()) {
+                        echo "<div class='respuesta mb-2'>";
+                        echo "<strong>" . htmlspecialchars($r['nombre']) . ":</strong> ";
+                        echo nl2br(htmlspecialchars($r['respuesta'])) . "<br>";
+                        echo "<small>" . $r['fecha'] . "</small>";
+                        echo "</div>";
+                    }
+                } else {
+                    echo "<p class='text-muted'><em>No hay respuestas aún.</em></p>";
+                }
+                echo "</div></div>";
+            }
+        } else {
+            echo "<p><em>No hay mensajes en el foro aún.</em></p>";
+        }
+
         exit;
     }
 }
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["publicar_foro"], $_POST["csrf"])) {
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
 
+    $titulo = trim($_POST['titulo']);
+    $mensaje = trim($_POST['mensaje']);
+
+    if ($titulo !== "" && $mensaje !== "") {
+        $stmt = $conexion->prepare("INSERT INTO foro (usuario_id, titulo, mensaje) VALUES (?, ?, ?)");
+        $stmt->bind_param("iss", $id, $titulo, $mensaje);
+        $stmt->execute();
+
+        header("Location: pagos.php?foro=ok");
+        exit;
+    }
+}
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["responder_foro"], $_POST["csrf"])) {
+    if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
+
+    $foro_id = intval($_POST['foro_id']);
+    $respuesta = trim($_POST['respuesta']);
+
+    if ($foro_id > 0 && $respuesta !== "") {
+        $stmt = $conexion->prepare("
+            INSERT INTO foro_respuestas (foro_id, usuario_id, respuesta)
+            VALUES (?, ?, ?)
+        ");
+        $stmt->bind_param("iis", $foro_id, $id, $respuesta);
+        $stmt->execute();
+
+        header("Location: pagos.php?foro_respuesta=ok");
+        exit;
+    }
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_foro'], $_POST['foro_id'])) {
+    $foro_id = intval($_POST['foro_id']);
+    $stmt = $conexion->prepare("DELETE FROM foro WHERE id = ? AND (usuario_id = ? OR ? = 1)");
+    $stmt->bind_param("iii", $foro_id, $id, $user['admin']);
+    $stmt->execute();
+    header("Location: pagos.php#seccion-foro");
+    exit;
+}
+
+// 🔹 Editar mensaje del foro
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_foro'], $_POST['foro_id'])) {
+    $foro_id = intval($_POST['foro_id']);
+    $foro_data = $conexion->prepare("SELECT titulo, mensaje FROM foro WHERE id = ? AND (usuario_id = ? OR ? = 1)");
+    $foro_data->bind_param("iii", $foro_id, $id, $user['admin']);
+    $foro_data->execute();
+    $foro_res = $foro_data->get_result();
+    if ($foro_res->num_rows > 0) {
+        $foro_edit = $foro_res->fetch_assoc();
+        $_SESSION['editar_foro'] = ['id' => $foro_id, 'titulo' => $foro_edit['titulo'], 'mensaje' => $foro_edit['mensaje']];
+    }
+    header("Location: pagos.php#seccion-foro");
+    exit;
+}
+
+// 🔹 Guardar edición del mensaje del foro
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_edicion_foro'])) {
+    $foro_id = intval($_POST['foro_id']);
+    $titulo = trim($_POST['titulo']);
+    $mensaje = trim($_POST['mensaje']);
+    $stmt = $conexion->prepare("UPDATE foro SET titulo = ?, mensaje = ? WHERE id = ? AND (usuario_id = ? OR ? = 1)");
+    $stmt->bind_param("ssiii", $titulo, $mensaje, $foro_id, $id, $user['admin']);
+    $stmt->execute();
+    unset($_SESSION['editar_foro']);
+    header("Location: pagos.php#seccion-foro");
+    exit;
+}
+
+// 🔹 Eliminar respuesta
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminar_respuesta'], $_POST['respuesta_id'])) {
+    $respuesta_id = intval($_POST['respuesta_id']);
+    $stmt = $conexion->prepare("DELETE FROM foro_respuestas WHERE id = ? AND (usuario_id = ? OR ? = 1)");
+    $stmt->bind_param("iii", $respuesta_id, $id, $user['admin']);
+    $stmt->execute();
+    header("Location: pagos.php#seccion-foro");
+    exit;
+}
+
+// 🔹 Editar respuesta
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar_respuesta'], $_POST['respuesta_id'])) {
+    $respuesta_id = intval($_POST['respuesta_id']);
+    $res_data = $conexion->prepare("SELECT respuesta FROM foro_respuestas WHERE id = ? AND (usuario_id = ? OR ? = 1)");
+    $res_data->bind_param("iii", $respuesta_id, $id, $user['admin']);
+    $res_data->execute();
+    $res_res = $res_data->get_result();
+    if ($res_res->num_rows > 0) {
+        $res_edit = $res_res->fetch_assoc();
+        $_SESSION['editar_respuesta'] = ['id' => $respuesta_id, 'respuesta' => $res_edit['respuesta']];
+    }
+    header("Location: pagos.php#seccion-foro");
+    exit;
+}
+
+// 🔹 Guardar edición de respuesta
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_edicion_respuesta'])) {
+    $respuesta_id = intval($_POST['respuesta_id']);
+    $texto = trim($_POST['respuesta']);
+    $stmt = $conexion->prepare("UPDATE foro_respuestas SET respuesta = ? WHERE id = ? AND (usuario_id = ? OR ? = 1)");
+    $stmt->bind_param("siii", $texto, $respuesta_id, $id, $user['admin']);
+    $stmt->execute();
+    unset($_SESSION['editar_respuesta']);
+    header("Location: pagos.php#seccion-foro");
+    exit;
+}
 // =========================================================================
 // === AGREGAR EVENTO (SOLO ADMIN) ===
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["agregar_evento"], $_POST["csrf"])) {
@@ -84,42 +231,38 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["agregar_evento"], $_P
     }
 }
 
-// =========================================================================
-// === LISTAR EVENTOS + CUMPLEAÑOS ===
-if (isset($_GET['accion']) && $_GET['accion'] === 'cumpleanos') {
-    header('Content-Type: application/json');
+if (isset($_GET['action'])) {
+  header('Content-Type: application/json');
 
+  // 📅 Listar eventos
+  if ($_GET['action'] === 'listar_eventos') {
+    $res = $conexion->query("SELECT id_evento AS id, titulo AS title, descripcion AS description, fecha_evento AS start FROM calendario");
     $eventos = [];
-
-    // 1️⃣ Eventos normales
-    $resultEventos = $conexion->query("SELECT titulo, descripcion, fecha_evento FROM calendario ORDER BY fecha_evento ASC");
-    while($fila = $resultEventos->fetch_assoc()) {
-        $eventos[] = [
-            'title' => $fila['titulo'],
-            'start' => $fila['fecha_evento'],
-            'description' => $fila['descripcion'],
-            'allDay' => true,
-            'color' => '#6ebbe9', // eventos normales
-        ];
-    }
-
-    // 2️⃣ Cumpleaños recurrentes
-    $queryCumples = $conexion->query("SELECT nombre AS nombre_completo, fecha_nacimiento FROM miembro WHERE fecha_nacimiento IS NOT NULL");
-    while($row = $queryCumples->fetch_assoc()) {
-        $eventos[] = [
-            'title' => "🎂 " . $row['nombre_completo'],
-            'rrule' => [
-                'freq' => 'yearly',
-                'bymonthday' => (int)date('d', strtotime($row['fecha_nacimiento'])),
-                'bymonth' => (int)date('m', strtotime($row['fecha_nacimiento']))
-            ],
-            'allDay' => true,
-            'color' => '#f7a500', // cumpleaños
-        ];
-    }
-
+    while ($row = $res->fetch_assoc()) $eventos[] = $row;
     echo json_encode($eventos);
     exit;
+  }
+
+  // ✏️ Editar evento
+  if ($_GET['action'] === 'editar_evento') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $id = intval($data['id']);
+    $titulo = $conexion->real_escape_string($data['titulo']);
+    $descripcion = $conexion->real_escape_string($data['descripcion']);
+    $fecha = $conexion->real_escape_string($data['fecha']);
+    $conexion->query("UPDATE calendario SET titulo='$titulo', descripcion='$descripcion', fecha_evento='$fecha' WHERE id_evento=$id");
+    echo json_encode(['ok' => $conexion->affected_rows > 0]);
+    exit;
+  }
+
+  // 🗑️ Eliminar evento
+  if ($_GET['action'] === 'eliminar_evento') {
+    $data = json_decode(file_get_contents("php://input"), true);
+    $id = intval($data['id']);
+    $conexion->query("DELETE FROM calendario WHERE id_evento=$id");
+    echo json_encode(['ok' => $conexion->affected_rows > 0]);
+    exit;
+  }
 }
 
 // =========================================================================
@@ -928,49 +1071,167 @@ a:hover {
                 </div>
             </div>
             <?php endif; ?>
+<?php if (isset($_SESSION['editar_foro'])): ?>
+  <div style="margin-bottom: 20px; background:rgba(255,255,255,0.08); padding:15px; border-radius:10px;">
+    <h3>✏️ Editar mensaje</h3>
+    <form method="POST" action="">
+        <input type="hidden" name="foro_id" value="<?= $_SESSION['editar_foro']['id'] ?>">
+        <input type="text" name="titulo" value="<?= htmlspecialchars($_SESSION['editar_foro']['titulo']) ?>" required>
+        <textarea name="mensaje" required><?= htmlspecialchars($_SESSION['editar_foro']['mensaje']) ?></textarea>
+        <button type="submit" name="guardar_edicion_foro" class="postularme">Guardar cambios</button>
+    </form>
+  </div>
+<?php endif; ?>            
 <div id="seccion-foro" class="seccion">
   <div class="form-box">
     <h2>💬 Foro Comunitario</h2>
 
-    <!-- Formulario para publicar -->
+    <!-- Formulario para publicar un nuevo mensaje -->
     <form method="POST" action="">
         <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
+        <input type="text" name="titulo" placeholder="Título del mensaje" required>
         <textarea name="mensaje" placeholder="Escribe tu mensaje..." required></textarea>
         <button type="submit" name="publicar_foro" class="postularme">Publicar</button>
     </form>
 
     <hr style="margin: 20px 0; border-color: rgba(255,255,255,0.2);">
 
-    <!-- Mostrar mensajes -->
     <h3>Mensajes recientes</h3>
-    <div style="max-height: 400px; overflow-y: auto;">
+    <div style="max-height: 500px; overflow-y: auto;">
 
-      <?php
-      $foro = $conexion->query("
-        SELECT f.*, m.nombre AS autor 
-        FROM foro f 
-        JOIN miembro m ON f.id_miembro = m.id_miembro 
-        ORDER BY f.fecha_publicacion DESC
-      ");
-      if ($foro->num_rows > 0):
-          while ($fila = $foro->fetch_assoc()):
-      ?>
-          <div style="margin-bottom:15px; padding:10px; background:rgba(255,255,255,0.05); border-radius:8px;">
-              <strong style="color:#6ebbe9;"><?= htmlspecialchars($fila['autor']) ?></strong> 
-              <span style="color:#aaa; font-size:12px;">
-                (<?= date("d/m/Y H:i", strtotime($fila['fecha_publicacion'])) ?>)
-              </span>
-              <p style="margin-top:5px;"><?= nl2br(htmlspecialchars($fila['mensaje'])) ?></p>
-          </div>
-      <?php
-          endwhile;
-      else:
-          echo "<p><em>No hay mensajes aún.</em></p>";
-      endif;
-      ?>
-    </div>
+<?php        
+$foro = $conexion->query("
+    SELECT f.id, f.titulo, f.mensaje, f.fecha, f.usuario_id, m.nombre AS autor
+    FROM foro f
+    JOIN miembro m ON f.usuario_id = m.id_miembro
+    ORDER BY f.fecha DESC
+");
+
+if (!$foro) {
+    echo "<p style='color:red'>❌ Error en la consulta del foro: " . htmlspecialchars($conexion->error) . "</p>";
+} else {
+    if ($foro->num_rows > 0):
+        while ($fila = $foro->fetch_assoc()):
+?>
+        <div style="position:relative; margin-bottom:20px; padding:15px; background:rgba(255,255,255,0.05); border-radius:10px;">
+
+            <!-- 🔹 Menú de opciones (solo si es tu mensaje o eres admin) -->
+            <?php if ($fila['usuario_id'] == $id || $_SESSION['admin'] ?? false): ?>
+                <div style="position:absolute; top:10px; right:10px;">
+                    <div class="menu-opciones" style="position:relative; display:inline-block;">
+                        <button type="button" onclick="toggleMenu(this)" style="background:none; border:none; color:white; font-size:18px; cursor:pointer;">⋮</button>
+                        <div class="dropdown-menu" style="display:none; position:absolute; right:0; background:#333; border-radius:6px; padding:5px; z-index:10;">
+                            <form method="POST" action="" style="margin:0;">
+                                <input type="hidden" name="foro_id" value="<?= $fila['id'] ?>">
+                                <button type="submit" name="editar_foro" style="background:none; border:none; color:white; padding:5px 10px; width:100%; text-align:left;">✏️ Editar</button>
+                            </form>
+                            <form method="POST" action="" style="margin:0;">
+                                <input type="hidden" name="foro_id" value="<?= $fila['id'] ?>">
+                                <button type="submit" name="eliminar_foro" onclick="return confirm('¿Eliminar este mensaje?');" style="background:none; border:none; color:#f66; padding:5px 10px; width:100%; text-align:left;">🗑️ Eliminar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <strong style="color:#6ebbe9;"><?= htmlspecialchars($fila['autor']) ?></strong> 
+            <span style="color:#aaa; font-size:12px;">
+                (<?= date("d/m/Y H:i", strtotime($fila['fecha'])) ?>)
+            </span>
+            <h4 style="margin:8px 0;"><?= htmlspecialchars($fila['titulo']) ?></h4>
+            <p style="margin-bottom:10px;"><?= nl2br(htmlspecialchars($fila['mensaje'])) ?></p>
+
+            <!-- 🔹 Mostrar respuestas -->
+            <div style="margin-left:20px; border-left:2px solid rgba(255,255,255,0.1); padding-left:10px; margin-top:10px;">
+            <?php
+            $respuestas = $conexion->prepare("
+                SELECT r.id, r.respuesta, r.fecha, r.usuario_id, m.nombre
+                FROM foro_respuestas r
+                JOIN miembro m ON r.usuario_id = m.id_miembro
+                WHERE r.foro_id = ?
+                ORDER BY r.fecha ASC
+            ");
+            $respuestas->bind_param("i", $fila['id']);
+            $respuestas->execute();
+            $res = $respuestas->get_result();
+
+            if ($res && $res->num_rows > 0):
+                while ($r = $res->fetch_assoc()):
+            ?>
+                <div style="position:relative; margin-top:8px; padding:6px 8px; background:rgba(255,255,255,0.03); border-radius:6px;">
+                    <!-- 🔹 Menú en respuestas -->
+                    <?php if ($r['usuario_id'] == $id || $_SESSION['admin'] ?? false): ?>
+                        <div style="position:absolute; top:5px; right:5px;">
+                            <div class="menu-opciones" style="position:relative; display:inline-block;">
+                                <button type="button" onclick="toggleMenu(this)" style="background:none; border:none; color:white; font-size:14px; cursor:pointer;">⋮</button>
+                                <div class="dropdown-menu" style="display:none; position:absolute; right:0; background:#333; border-radius:6px; padding:5px; z-index:10;">
+                                    <form method="POST" action="" style="margin:0;">
+                                        <input type="hidden" name="respuesta_id" value="<?= $r['id'] ?>">
+                                        <button type="submit" name="editar_respuesta" style="background:none; border:none; color:white; padding:5px 10px; width:100%; text-align:left;">✏️ Editar</button>
+                                    </form>
+                                    <form method="POST" action="" style="margin:0;">
+                                        <input type="hidden" name="respuesta_id" value="<?= $r['id'] ?>">
+                                        <button type="submit" name="eliminar_respuesta" onclick="return confirm('¿Eliminar esta respuesta?');" style="background:none; border:none; color:#f66; padding:5px 10px; width:100%; text-align:left;">🗑️ Eliminar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <strong><?= htmlspecialchars($r['nombre']) ?>:</strong>
+                    <?= nl2br(htmlspecialchars($r['respuesta'])) ?>
+                    <div style="font-size:11px; color:#aaa;">
+                        <?= date("d/m/Y H:i", strtotime($r['fecha'])) ?>
+                    </div>
+                </div>
+            <?php
+                endwhile;
+            else:
+                echo "<em style='color:#888;'>No hay respuestas aún.</em>";
+            endif;
+            ?>
+            </div>
+
+            <!-- 🔹 Formulario de respuesta -->
+            <form method="POST" action="" style="margin-top:10px;">
+                <input type="hidden" name="csrf" value="<?= htmlspecialchars($_SESSION['csrf']) ?>">
+                <input type="hidden" name="foro_id" value="<?= $fila['id'] ?>">
+                <textarea name="respuesta" placeholder="Escribe una respuesta..." required></textarea>
+                <button type="submit" name="responder_foro" class="postularme">Responder</button>
+            </form>
+        </div>
+<?php
+        endwhile;
+    else:
+        echo "<p><em>No hay mensajes aún.</em></p>";
+    endif;
+}
+?>   
+
+<script>
+function toggleMenu(btn) {
+  const menu = btn.nextElementSibling;
+  const visible = menu.style.display === 'block';
+  document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+  menu.style.display = visible ? 'none' : 'block';
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.menu-opciones')) {
+    document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+  }
+});
+</script>
+<?php if (isset($_SESSION['editar_respuesta'])): ?>
+  <div style="margin-bottom: 20px; background:rgba(255,255,255,0.08); padding:15px; border-radius:10px;">
+    <h3>✏️ Editar respuesta</h3>
+    <form method="POST" action="">
+        <input type="hidden" name="respuesta_id" value="<?= $_SESSION['editar_respuesta']['id'] ?>">
+        <textarea name="respuesta" required><?= htmlspecialchars($_SESSION['editar_respuesta']['respuesta']) ?></textarea>
+        <button type="submit" name="guardar_edicion_respuesta" class="postularme">Guardar cambios</button>
+    </form>
   </div>
-</div>
+<?php endif; ?>
+
 
 <!-- ==================== SECCIÓN CALENDARIO ==================== -->
 <div id="seccion-calendario" class="seccion">
@@ -995,84 +1256,167 @@ a:hover {
 </div> 
 </main>
 
-<script>             
+<!-- Librerías -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+<script>
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("✅ Script principal cargado");
+  console.log("✅ Script calendario cargado");
 
-    const items = document.querySelectorAll(".lateral li");
-    const secciones = document.querySelectorAll(".seccion");
-    let calendar; // variable global del calendario
+  const items = document.querySelectorAll(".lateral li");
+  const secciones = document.querySelectorAll(".seccion");
 
-    // 🗓️ Función para inicializar el calendario
-    function inicializarCalendario() {
-        const calendarEl = document.getElementById('calendar');
-        if (!calendarEl) return;
+  // --- Función para activar secciones ---
+  function activarSeccion(id) {
+    secciones.forEach(sec => sec.classList.remove("activa"));
+    items.forEach(i => i.classList.remove("activa-menu"));
 
-        // Evitar múltiples instancias
-        if (calendar) {
-            calendar.destroy();
-        }
+    const target = document.getElementById(id);
+    const menuItem = document.querySelector(`.lateral li[data-target="${id}"]`);
 
-        calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'es',
-            height: 'auto',
-            expandRows: true,
-            contentHeight: 'auto',
-            events: 'pagos.php?action=listar_eventos', // 🔥 carga desde el mismo PHP
-            eventColor: '#3a87ad',
-            eventTextColor: '#fff',
-            eventDisplay: 'block',
-            eventDidMount: (info) => {
-                if (info.event.extendedProps.description) {
-                    info.el.setAttribute('title', info.event.extendedProps.description);
-                }
+    if (target) target.classList.add("activa");
+    if (menuItem) menuItem.classList.add("activa-menu");
+
+    if (id === "seccion-calendario" && window.__fc_instance) {
+      setTimeout(() => {
+        window.__fc_instance.refetchEvents();
+        window.__fc_instance.render();
+      }, 200);
+    }
+  }
+
+  // --- Menú lateral ---
+  items.forEach(item => {
+    item.addEventListener("click", () => {
+      const targetId = item.dataset.target;
+      activarSeccion(targetId);
+      history.replaceState(null, '', `#${targetId}`);
+    });
+  });
+
+  // --- Inicializar calendario ---
+  const calendarEl = document.getElementById('calendar');
+  if (calendarEl) {
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'es',
+      height: 'auto',
+      events: 'pagos.php?action=listar_eventos',
+      eventColor: '#6ebbe9',
+      eventTextColor: '#fff',
+      eventDisplay: 'block',
+
+      // Mostrar modal al hacer click en evento
+      eventClick: async function(info) {
+        info.jsEvent.preventDefault();
+        const titulo = info.event.title;
+        const descripcion = info.event.extendedProps.description || 'Sin descripción';
+        const fecha = info.event.startStr;
+        const idEvento = info.event.id;
+
+        const result = await Swal.fire({
+          title: titulo,
+          html: `<b>📅 Fecha:</b> ${fecha}<br><br><b>📝 Descripción:</b><br>${descripcion}`,
+          icon: 'info',
+          confirmButtonText: 'Cerrar',
+          showDenyButton: <?= ($user['admin'] == 1 ? 'true' : 'false') ?>,
+          denyButtonText: 'Editar / Eliminar',
+          confirmButtonColor: '#3085d6',
+          denyButtonColor: '#6ebbe9',
+          width: 400
+        });
+
+        // --- Solo si el admin elige editar/eliminar ---
+        if (result.isDenied) {
+          const action = await Swal.fire({
+            title: 'Editar o eliminar evento',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Editar',
+            denyButtonText: 'Eliminar',
+            cancelButtonText: 'Cerrar'
+          });
+
+          // Editar evento
+          if (action.isConfirmed) {
+            const { value: formValues } = await Swal.fire({
+              title: 'Editar evento',
+              html:
+                `<input id="swal-titulo" class="swal2-input" placeholder="Título" value="${titulo}">` +
+                `<textarea id="swal-desc" class="swal2-textarea" placeholder="Descripción">${descripcion}</textarea>` +
+                `<input id="swal-fecha" type="date" class="swal2-input" value="${fecha}">`,
+              focusConfirm: false,
+              confirmButtonText: 'Guardar cambios',
+              cancelButtonText: 'Cerrar',
+              showCancelButton: true,
+              preConfirm: () => {
+                return {
+                  titulo: document.getElementById('swal-titulo').value,
+                  descripcion: document.getElementById('swal-desc').value,
+                  fecha: document.getElementById('swal-fecha').value
+                };
+              }
+            });
+
+            if (formValues) {
+              const resp = await fetch('pagos.php?action=editar_evento', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: idEvento, ...formValues })
+              });
+              const data = await resp.json();
+              if (data.ok) {
+                Swal.fire('✅ Evento actualizado', '', 'success');
+                calendar.refetchEvents();
+              } else {
+                Swal.fire('❌ Error al actualizar', '', 'error');
+              }
             }
-        });
+          }
 
-        calendar.render();
+          // Eliminar evento
+          else if (action.isDenied) {
+            const conf = await Swal.fire({
+              title: '¿Eliminar evento?',
+              text: 'Esta acción no se puede deshacer.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, eliminar',
+              cancelButtonText: 'Cerrar'
+            });
 
-        // 🔥 Asegurar render correcto cuando la sección aparece
-        setTimeout(() => {
-            calendar.updateSize();
-            calendar.render();
-        }, 200);
-    }
-
-    // 🔹 Activar secciones
-    function activarSeccion(id) {
-        secciones.forEach(sec => sec.classList.remove("activa"));
-        items.forEach(i => i.classList.remove("activa-menu"));
-
-        const target = document.getElementById(id);
-        const menuItem = document.querySelector(`.lateral li[data-target="${id}"]`);
-
-        if (target) target.classList.add("activa");
-        if (menuItem) menuItem.classList.add("activa-menu");
-
-        // Si es la sección del calendario
-        if (id === "seccion-calendario") {
-            setTimeout(inicializarCalendario, 150);
+            if (conf.isConfirmed) {
+              const resp = await fetch('pagos.php?action=eliminar_evento', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: idEvento })
+              });
+              const data = await resp.json();
+              if (data.ok) {
+                Swal.fire('🗑️ Evento eliminado', '', 'success');
+                calendar.refetchEvents();
+              } else {
+                Swal.fire('❌ Error al eliminar', '', 'error');
+              }
+            }
+          }
         }
-    }
-
-    // 🔹 Click en menú lateral
-    items.forEach(item => {
-        item.addEventListener("click", (e) => {
-            e.preventDefault();
-            const targetId = item.dataset.target;
-            activarSeccion(targetId);
-            history.replaceState(null, null, "#" + targetId);
-        });
+      }
     });
 
-    // 🔹 Detectar hash o cargar inicio
-    const hash = window.location.hash;
-    if (hash && document.querySelector(hash)) {
-        activarSeccion(hash.replace("#", ""));
-    } else {
-        activarSeccion("seccion-inicio");
-    }
+    calendar.render();
+    window.__fc_instance = calendar;
+  }
+
+  // --- Mostrar la sección correcta al recargar ---
+  const hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById(hash)) {
+    activarSeccion(hash);
+  } else {
+    activarSeccion('seccion-calendario');
+    history.replaceState(null, '', '#seccion-calendario');
+  }
 });
 </script>
 </body>

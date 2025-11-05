@@ -78,6 +78,10 @@ INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `fecha_nacim
 --
 -- Estructura de tabla para la tabla `pago`
 --
+ALTER TABLE `miembro`
+  ADD PRIMARY KEY (`id_miembro`),
+  ADD UNIQUE KEY `email` (`email`),
+  ADD KEY `fk_miembro_unidad` (`id_unidad`);
 
 CREATE TABLE `pago` (
   `id_pago` int(11) NOT NULL,
@@ -253,22 +257,49 @@ INSERT INTO `unidad_habitacional` (`id_unidad`, `metros_cuadrados`, `estado_un`)
 (99, 45.00, 'disponible'),
 (100, 45.00, 'disponible');
 
-CREATE TABLE calendario (
-    id_evento INT(11) NOT NULL AUTO_INCREMENT,
-    titulo VARCHAR(255) NOT NULL,
-    descripcion TEXT NULL DEFAULT NULL,
-    fecha_evento DATE NOT NULL,
-    creado_por INT(11) NULL DEFAULT NULL,
-    PRIMARY KEY (id_evento)
+CREATE TABLE `calendario` (
+    `id_evento` INT(11) NOT NULL AUTO_INCREMENT,
+    `titulo` VARCHAR(255) NOT NULL,
+    `descripcion` TEXT NULL DEFAULT NULL,
+    `fecha_evento` DATE NOT NULL,
+    `creado_por` INT(11) NULL DEFAULT NULL,
+    PRIMARY KEY (`id_evento`)
 );
 
-CREATE TABLE foro (
-    id_foro INT(11) NOT NULL AUTO_INCREMENT,
-    id_miembro INT(11) NOT NULL,
-    mensaje TEXT NOT NULL,
-    fecha_publicacion DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id_foro)
-);
+CREATE TABLE `foro` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `usuario_id` INT(11) NOT NULL,
+    `titulo` VARCHAR(255) NOT NULL,
+    `mensaje` TEXT NOT NULL,
+    `fecha` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    INDEX (`usuario_id`),
+    CONSTRAINT `fk_foro_miembro` 
+        FOREIGN KEY (`usuario_id`) 
+        REFERENCES `miembro`(`id_miembro`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB 
+  DEFAULT CHARSET=utf8mb4 
+  COLLATE=utf8mb4_general_ci;
+
+
+CREATE TABLE `foro_respuestas` (
+    `id` INT(11) AUTO_INCREMENT,
+    `foro_id` INT(11) NOT NULL,
+    `usuario_id` INT(11) NOT NULL,
+    `respuesta` TEXT NOT NULL,
+    `fecha` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_respuesta_foro`
+    FOREIGN KEY (`foro_id`) REFERENCES `foro`(`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+     CONSTRAINT `fk_respuesta_usuario`   
+    FOREIGN KEY (`usuario_id`) REFERENCES `miembro`(`id_miembro`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 --
 -- Indices de la tabla `horas`
 --
@@ -279,10 +310,7 @@ ALTER TABLE `horas`
 --
 -- Indices de la tabla `miembro`
 --
-ALTER TABLE `miembro`
-  ADD PRIMARY KEY (`id_miembro`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD KEY `fk_miembro_unidad` (`id_unidad`);
+
 
 --
 -- Indices de la tabla `pago`
