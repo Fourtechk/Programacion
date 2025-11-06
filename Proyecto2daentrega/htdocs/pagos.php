@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// Generar token CSRF si no existe
 if (!isset($_SESSION['csrf'])) {
     $_SESSION['csrf'] = bin2hex(random_bytes(32));
 }
 
 require "conexion.php";
-
 // Verificar login
 if (!isset($_SESSION["id"])) {
     header("Location: login.php");
@@ -42,20 +40,63 @@ $resultUser = $stmtUser->get_result();
 $user = $resultUser ? $resultUser->fetch_assoc() : null;
 
 if (!$user || ($user["es_miembro"] != 1 && $user["admin"] != 1)) {
-    header("Location: pagina.php");
+    header("Location: pagos.php");
     exit();
 }
 
+// ⚠️ BLOQUE DE EVENTOS — TIENE QUE IR ANTES DE CUALQUIER HTML O ECHO
+if (isset($_GET['action']) && strpos($_GET['action'], 'evento') !== false) {
+    header('Content-Type: application/json; charset=utf-8');
+
+    switch ($_GET['action']) {
+
+        case 'listar_eventos':
+            $res = $conexion->query("
+                SELECT 
+                    id_evento AS id, 
+                    titulo AS title, 
+                    descripcion AS description, 
+                    fecha_evento AS start 
+                FROM calendario
+            ");
+            $eventos = [];
+            while ($row = $res->fetch_assoc()) {
+                $eventos[] = $row;
+            }
+            echo json_encode($eventos);
+            exit;
+
+        case 'editar_evento':
+            $data = json_decode(file_get_contents('php://input'), true);
+            $idE = intval($data['id']);
+            $titulo = $conexion->real_escape_string($data['titulo']);
+            $descripcion = $conexion->real_escape_string($data['descripcion']);
+            $fecha = $conexion->real_escape_string($data['fecha']);
+            $conexion->query("
+                UPDATE calendario 
+                SET titulo='$titulo', descripcion='$descripcion', fecha_evento='$fecha' 
+                WHERE id_evento=$idE
+            ");
+            echo json_encode(['ok' => $conexion->affected_rows > 0]);
+            exit;
+
+        case 'eliminar_evento':
+            $data = json_decode(file_get_contents('php://input'), true);
+            $idE = intval($data['id']);
+            $conexion->query("DELETE FROM calendario WHERE id_evento=$idE");
+            echo json_encode(['ok' => $conexion->affected_rows > 0]);
+            exit;
+    }
+}   
+
 if (isset($_GET['action']) && $_GET['action'] === 'listar_foro') {
 
-    // Evitar romper la carga normal del sitio
     if (
         isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
         strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
     ) {
         header('Content-Type: text/html; charset=utf-8');
 
-        // 🔹 Cargar los mensajes del foro con el nombre del autor
         $mensajes = $conexion->query("
             SELECT f.id, f.titulo, f.mensaje, f.fecha, m.nombre
             FROM foro f
@@ -70,7 +111,6 @@ if (isset($_GET['action']) && $_GET['action'] === 'listar_foro') {
                 echo "<p>" . nl2br(htmlspecialchars($row['mensaje'])) . "</p>";
                 echo "<small>Por " . htmlspecialchars($row['nombre']) . " el " . $row['fecha'] . "</small>";
 
-                // 🔹 Respuestas al mensaje (tabla foro_respuestas)
                 $respuestas = $conexion->prepare("
                     SELECT r.respuesta, r.fecha, m.nombre
                     FROM foro_respuestas r
@@ -231,39 +271,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["agregar_evento"], $_P
     }
 }
 
-if (isset($_GET['action']) && strpos($_GET['action'], 'evento') !== false) {
-  header('Content-Type: application/json');
-
-  // 📅 Listar eventos
-  if ($_GET['action'] === 'listar_eventos') {
-    $res = $conexion->query("SELECT id_evento AS id, titulo AS title, descripcion AS description, fecha_evento AS start FROM calendario");
-    $eventos = [];
-    while ($row = $res->fetch_assoc()) $eventos[] = $row;
-    echo json_encode($eventos);
-    exit;
-  }
-
-  // ✏️ Editar evento
-  if ($_GET['action'] === 'editar_evento') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    $id = intval($data['id']);
-    $titulo = $conexion->real_escape_string($data['titulo']);
-    $descripcion = $conexion->real_escape_string($data['descripcion']);
-    $fecha = $conexion->real_escape_string($data['fecha']);
-    $conexion->query("UPDATE calendario SET titulo='$titulo', descripcion='$descripcion', fecha_evento='$fecha' WHERE id_evento=$id");
-    echo json_encode(['ok' => $conexion->affected_rows > 0]);
-    exit;
-  }
-
-  // 🗑️ Eliminar evento
-  if ($_GET['action'] === 'eliminar_evento') {
-    $data = json_decode(file_get_contents("php://input"), true);
-    $id = intval($data['id']);
-    $conexion->query("DELETE FROM calendario WHERE id_evento=$id");
-    echo json_encode(['ok' => $conexion->affected_rows > 0]);
-    exit;
-  }
-}
 
 // =========================================================================
 // === SUBIDA Y ACTUALIZACIÓN DE FOTO DE PERFIL ===
@@ -349,6 +356,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'], $_POST['estado'
 
 // =========================================================================
 // === REGISTRO DE ASISTENCIA ===
+// =========================================================================
+// === REGISTRO DE ASISTENCIA ===
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"], $_POST["csrf"])) {
     if (!hash_equals($_SESSION['csrf'], $_POST['csrf'])) die("Token CSRF inválido");
 
@@ -361,6 +370,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
         $registro = "asistio=1;horas={$horasRealizadas};actividad={$actividad}";
 
         if ($horasRealizadas > 0) {
+            // Sumar horas a pendientes (el admin luego las aprueba)
             $updateHoras = $conexion->prepare("UPDATE horas SET horas_pendientes = horas_pendientes + ? WHERE id_miembro = ?");
             $updateHoras->bind_param("ii", $horasRealizadas, $id);
             $updateHoras->execute();
@@ -382,9 +392,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
         $registro = "asistio=0;justificativo={$justificativo}";
     }
 
-    $stmtInsertAsistencia = $conexion->prepare("INSERT INTO asistencia (id_miembro, registro) VALUES (?, ?)");
-    $stmtInsertAsistencia->bind_param("is", $id, $registro);
-    $stmtInsertAsistencia->execute();
+    // 🔸 Guardar el registro textual en justificativos (concatenar)
+    $updateHistorial = $conexion->prepare("
+        UPDATE horas
+        SET justificativos = CONCAT(IFNULL(justificativos, ''), ?, '|')
+        WHERE id_miembro = ?
+    ");
+    $updateHistorial->bind_param("si", $registro, $id);
+    $updateHistorial->execute();
 
     header("Location: pagos.php?asistencia=ok");
     exit;
@@ -819,9 +834,6 @@ a:hover {
 .seccion { display:none; }
 .activa-menu { font-weight:bold; }
 
-#seccion-calendario,
-#seccion-calendario .form-box,
-#calendar,
 .form-wrapper {
   display: block !important;
   visibility: visible !important;
@@ -829,6 +841,7 @@ a:hover {
   min-height: 400px !important;
   overflow: visible !important;
 }
+
 </style>
 
 </head>
@@ -1430,7 +1443,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hash && document.getElementById(hash)) {
     activarSeccion(hash);
   } else {
-    activarSeccion('seccion-calendario');
+    activarSeccion('seccion-inicio');
     if (window.__fc_instance) {
   setTimeout(() => {
     window.__fc_instance.updateSize();
@@ -1440,28 +1453,6 @@ document.addEventListener('DOMContentLoaded', () => {
     history.replaceState(null, '', '#seccion-calendario');
   }
 });
-document.addEventListener('DOMContentLoaded', () => {
-  // 🔧 Reparar visibilidad del calendario al cargar
-  const calendario = document.getElementById('calendar');
-  if (calendario) {
-    const wrapper = calendario.closest('.form-wrapper');
-    if (wrapper) {
-      wrapper.style.minHeight = '500px';
-      wrapper.style.overflow = 'visible';
-      wrapper.style.display = 'block';
-    }
-  }
-
-  // 🔁 Forzar render tras layout
-  setTimeout(() => {
-    if (window.__fc_instance) {
-      window.__fc_instance.updateSize();
-      window.__fc_instance.render();
-      console.log('🟢 Calendario re-renderizado automáticamente al cargar');
-    }
-  }, 800);
-});
-
 </script>
 </body>
 </html>

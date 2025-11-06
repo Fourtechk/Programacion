@@ -72,8 +72,8 @@ CREATE TABLE `miembro` (
 --
 
 INSERT INTO `miembro` (`id_miembro`, `nombre`, `email`, `password`, `fecha_nacimiento`, `aprobado`, `es_miembro`, `admin`, `estado`, `id_unidad`, `fecha_ingreso`, `foto_perfil`) VALUES
-(1, 'Administrador General', 'admin@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', '2000-11-20', 1, 1, 1, 'activo', 1, '2025-01-01', 'perfiles/perfil_8_1761134422.jpg'),
-(2, 'Miembro', 'miembro@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', '2007-09-13', 1, 1, 0, 'activo', 2, '2025-10-22', 'perfiles/perfil_8_1761134422.jpg');
+(1, 'Administrador General', 'admin@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', '2000-11-20', 1, 1, 1, 'activo', 1, '2025-01-01', 'perfiles/perfil_1_1762437313.jpg'),
+(2, 'Miembro', 'miembro@gmail.com', '$2y$10$EB5bCH08G3dluMHJttBIVOBaLfcA7r40Fp4ttkKghE7kv6t2MTsle', '2007-09-13', 1, 1, 0, 'activo', 2, '2025-10-22', 'perfiles/perfil_1_1762437313.jpg');
 
 --
 -- Estructura de tabla para la tabla `pago`
