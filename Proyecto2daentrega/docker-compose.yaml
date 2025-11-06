@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  app:
+    build: ./app
+    container_name: sistema_app
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - appnet
+
+  db:
+    image: mysql:8.0
+    container_name: sistema_backup
+    restart: always
+    env_file: .env
+    environment:
+      MYSQL_ROOT_HOST: "192.168.1.50"
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+    networks:
+      - appnet
+  
+  backup:
+    build: ./backup
+    container_name: sistema_backup
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      - db 
+    networks:
+      - appnet
+
+volumes:
+  db_data: 
+
+networks:
+  appnet:
