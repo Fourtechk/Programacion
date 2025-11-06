@@ -256,10 +256,17 @@ switch ($view) {
         if (empty($_SESSION['csrf'])) { $_SESSION['csrf'] = bin2hex(random_bytes(16)); }
         $csrf = $_SESSION['csrf'];
 
-        $sql_c = "SELECT p.id_pago, m.nombre, m.email, p.monto, p.concepto, p.comprobante, p.estado_pa, p.fecha_p
-                FROM pago p
-                INNER JOIN miembro m ON m.id_miembro = p.id_miembro
-                ORDER BY p.fecha_p DESC";
+       $id_filtrado = isset($_GET['miembro']) ? intval($_GET['miembro']) : 0;
+
+$sql_c = "SELECT p.id_pago, m.id_miembro, m.nombre, m.email, p.monto, p.concepto, p.comprobante, p.estado_pa, p.fecha_p
+          FROM pago p
+          INNER JOIN miembro m ON m.id_miembro = p.id_miembro";
+
+if ($id_filtrado > 0) {
+    $sql_c .= " WHERE m.id_miembro = $id_filtrado";
+}
+
+$sql_c .= " ORDER BY p.fecha_p DESC";
         $datos_vista['comprobantes'] = $conexion->query($sql_c);
         break;
 
@@ -762,6 +769,22 @@ td form {
                     <p style='color: white; text-align:center;'><?= $mensajePago ?></p>
                 </div>
             <?php endif; ?>
+<?php
+$miembros_lista = $conexion->query("SELECT id_miembro, nombre FROM miembro ORDER BY nombre ASC");
+?>
+
+<form method="get" action="admin.php" style="text-align:center; margin-bottom:20px;">
+    <input type="hidden" name="view" value="comprobantes">
+    <label for="miembro" style="margin-right:10px;">Filtrar por miembro:</label>
+    <select name="miembro" id="miembro" onchange="this.form.submit()" style="padding:6px 10px; border-radius:8px;">
+        <option value="0">Todos</option>
+        <?php while($m = $miembros_lista->fetch_assoc()): ?>
+            <option value="<?= $m['id_miembro'] ?>" <?= ($id_filtrado == $m['id_miembro']) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($m['nombre']) ?>
+            </option>
+        <?php endwhile; ?>
+    </select>
+</form>
 
             <table>
                 <tr>
@@ -828,7 +851,7 @@ td form {
                     <th>Miembro</th>
                     <th>Horas Semanales (Req)</th>
                     <th>Horas Cumplidas</th>
-                    <th>Horas Pendientes (Manual)</th> <th>Justificativos</th>
+                    <th>Horas Pendientes</th> <th>Justificativos</th>
                     <th>Acción</th>
                 </tr>
                 <?php if (isset($datos_vista['horas'])): while($u = $datos_vista['horas']->fetch_assoc()): ?>
@@ -889,7 +912,40 @@ td form {
             <?php break; case 'postulaciones': ?>
             <h2>Listado de Postulaciones</h2>
 
-            <?php if (isset($datos_vista['postulaciones']) && $datos_vista['postulaciones']->num_rows > 0): ?>
+    <?php
+    // --- FILTRO PHP ---
+    // Tomamos el estado elegido (si existe)
+   $estado_po = isset($_GET['estado_po']) ? $_GET['estado_po'] : '';
+
+// si existe el array $datos_vista y tiene postulaciones, las filtramos ahí mismo
+$postulaciones_filtradas = [];
+
+if (isset($datos_vista['postulaciones']) && $datos_vista['postulaciones']->num_rows > 0) {
+    while ($p = $datos_vista['postulaciones']->fetch_assoc()) {
+        if ($estado_po == '') {
+            $postulaciones_filtradas[] = $p; // mostrar todas
+        } elseif ($estado_po == 'pendiente' && $p['estado_po'] == 'pendiente') {
+            $postulaciones_filtradas[] = $p;
+        } elseif ($estado_po == 'aceptada' && $p['estado_po'] == 'aceptada') {
+            $postulaciones_filtradas[] = $p;
+        }
+    }
+} else {
+    $postulaciones_filtradas = [];
+}
+?>
+
+    <!-- --- FORMULARIO DE FILTRO HTML --- -->
+<form method="get" action="admin.php" style="text-align:center; margin-bottom:20px;">
+    <input type="hidden" name="view" value="postulaciones">
+    <label for="estado_po" style="margin-right:10px;">Filtrar por estado:</label>
+    <select name="estado_po" id="estado_po" onchange="this.form.submit()" style="padding:6px 10px; border-radius:8px;">
+        <option value="">Todas</option>
+        <option value="pendiente" <?= ($estado_po == 'pendiente') ? 'selected' : '' ?>>Pendientes</option>
+        <option value="aceptada" <?= ($estado_po == 'aceptada') ? 'selected' : '' ?>>Aceptadas / Miembros</option>
+    </select>
+</form>
+            <?php if (count($postulaciones_filtradas) > 0): ?>
             <div style="overflow-x: auto;">
                <table style="width: 100%;">
                     <tr>
@@ -915,7 +971,7 @@ td form {
                     <th>Comentario admin</th>
                     <th>Fecha</th>
                 </tr>
-                <?php while($postulacion = $datos_vista['postulaciones']->fetch_assoc()): ?>
+                <?php foreach($postulaciones_filtradas as $postulacion): ?>
                 <tr>
                     <td><?= htmlspecialchars($postulacion["id_postulacion"]) ?></td>
                     <td><?= htmlspecialchars($postulacion["nombre_miembro"] ?? $postulacion["email_miembro"] ?? "Desconocido") ?></td>
@@ -939,7 +995,7 @@ td form {
                     <td><?= htmlspecialchars($postulacion["comentarios_admin"] ?? "") ?></td>
                     <td><?= htmlspecialchars($postulacion["fecha_postulacion"] ?? "") ?></td>
                 </tr>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             </table>
             </div>
 

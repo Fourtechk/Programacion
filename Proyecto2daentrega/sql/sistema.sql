@@ -43,8 +43,8 @@ CREATE TABLE `horas` (
 --
 
 INSERT INTO `horas` (`id_horas`, `semanales_req`, `cumplidas`, `fecha_t`, `id_miembro`, `horas_pendientes`, `justificativos`) VALUES
-(1, 21, 0, NULL, 1, 21, ''),
-(2, 21, 0, NULL, 2, 21, '');
+(1, 21, 0, NULL, 1, 0, ''),
+(2, 21, 0, NULL, 2, 0, '');
 
 -- --------------------------------------------------------
 

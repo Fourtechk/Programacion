@@ -7,7 +7,7 @@ if (!isset($_SESSION['id'])) {
     exit();
 }
 
-$id_miembro = (int) $_SESSION['id'];
+$id_miembro = $_SESSION['id_miembro'] ?? $_SESSION['id'];
 
 // Validar datos
 $monto = $_POST['monto'] ?? null;
