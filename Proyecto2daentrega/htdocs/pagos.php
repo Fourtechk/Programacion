@@ -231,7 +231,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["agregar_evento"], $_P
     }
 }
 
-if (isset($_GET['action'])) {
+if (isset($_GET['action']) && strpos($_GET['action'], 'evento') !== false) {
   header('Content-Type: application/json');
 
   // 📅 Listar eventos
@@ -397,8 +397,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["guardar_asistencia"],
 <head>
     <meta charset="UTF-8">
      <title>Pagos y Horas - Cooperativa</title>
-      <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
-      <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+     <!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
 
     <style>
@@ -755,8 +757,8 @@ a:hover {
 
 #calendar {
   width: 95%;
-  max-width: 1200px;
-  margin: 40px auto;
+  max-width: 900px;
+  margin: 0 auto;
   background-color: #fff;
   border-radius: 10px;
   padding: 20px;
@@ -764,6 +766,7 @@ a:hover {
   height: auto !important;
   overflow: hidden; /* 🔥 sin scroll */
   box-sizing: border-box;
+  box-shadow: none;
 }
 /* FullCalendar interno */
 .fc {
@@ -815,6 +818,17 @@ a:hover {
 .activa { display:block; }
 .seccion { display:none; }
 .activa-menu { font-weight:bold; }
+
+#seccion-calendario,
+#seccion-calendario .form-box,
+#calendar,
+.form-wrapper {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  min-height: 400px !important;
+  overflow: visible !important;
+}
 </style>
 
 </head>
@@ -1081,7 +1095,8 @@ a:hover {
         <button type="submit" name="guardar_edicion_foro" class="postularme">Guardar cambios</button>
     </form>
   </div>
-<?php endif; ?>            
+<?php endif; ?>     
+       
 <div id="seccion-foro" class="seccion">
   <div class="form-box">
     <h2>💬 Foro Comunitario</h2>
@@ -1231,8 +1246,9 @@ document.addEventListener('click', e => {
     </form>
   </div>
 <?php endif; ?>
-
-
+</div>
+</div>
+</div>
 <!-- ==================== SECCIÓN CALENDARIO ==================== -->
 <div id="seccion-calendario" class="seccion">
   <div class="form-box">
@@ -1415,9 +1431,37 @@ document.addEventListener('DOMContentLoaded', () => {
     activarSeccion(hash);
   } else {
     activarSeccion('seccion-calendario');
+    if (window.__fc_instance) {
+  setTimeout(() => {
+    window.__fc_instance.updateSize();
+    window.__fc_instance.render();
+  }, 300);
+}
     history.replaceState(null, '', '#seccion-calendario');
   }
 });
+document.addEventListener('DOMContentLoaded', () => {
+  // 🔧 Reparar visibilidad del calendario al cargar
+  const calendario = document.getElementById('calendar');
+  if (calendario) {
+    const wrapper = calendario.closest('.form-wrapper');
+    if (wrapper) {
+      wrapper.style.minHeight = '500px';
+      wrapper.style.overflow = 'visible';
+      wrapper.style.display = 'block';
+    }
+  }
+
+  // 🔁 Forzar render tras layout
+  setTimeout(() => {
+    if (window.__fc_instance) {
+      window.__fc_instance.updateSize();
+      window.__fc_instance.render();
+      console.log('🟢 Calendario re-renderizado automáticamente al cargar');
+    }
+  }, 800);
+});
+
 </script>
 </body>
 </html>

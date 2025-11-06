@@ -43,8 +43,8 @@ CREATE TABLE `horas` (
 --
 
 INSERT INTO `horas` (`id_horas`, `semanales_req`, `cumplidas`, `fecha_t`, `id_miembro`, `horas_pendientes`, `justificativos`) VALUES
-(1, 0, 101, NULL, 1, 0, '|asistio=1;horas=11;actividad=|asistio=1;horas=11;actividad=|asistio=1;horas=11;actividad=|asistio=1;horas=33;actividad=Aprobadas por admin|asistio=1;horas=3;actividad=|asistio=1;horas=3;actividad=Aprobadas por admin|asistio=1;horas=4;actividad=|asistio=0;justificativo=xq ta wacho justificativos/just_1_1757871999.pdf|asistio=0;justificativo=sqwad justificativos/just_1_1757873110.png|asistio=1;horas=4;actividad=Aprobadas por admin|asistio=0;justificativo=dwada justificativos/just_1_1757874992.jpeg|asistio=0;justificativo=wdw justificativos/just_1_1757875621.jpeg|asistio=0;justificativo=no pude|asistio=0;justificativo=no pude justificativos/just_1_1757876780.jpg'),
-(2, 10, 69, NULL, 2, 0, '|asistio=1;horas=4;actividad=caca|asistio=1;horas=21;actividad=Aprobadas por admin|asistio=0;justificativo=pq no pude|asistio=1;horas=3;actividad=swd|asistio=1;horas=11;actividad=|asistio=1;horas=14;actividad=Aprobadas por admin');
+(1, 21, 0, NULL, 1, 21, ''),
+(2, 21, 0, NULL, 2, 21, '');
 
 -- --------------------------------------------------------
 
