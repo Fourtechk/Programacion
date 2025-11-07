@@ -150,15 +150,39 @@ if ($view === 'horas' && $_SERVER["REQUEST_METHOD"] === "POST") {
 if ($view === 'miembros' && isset($_GET["socio"]) && isset($_GET["id"])) {
     $id_miembro_socio = intval($_GET["id"]);
     $socio = intval($_GET["socio"]);
-    
-    $stmt = $conexion->prepare("UPDATE miembro SET es_miembro = ? WHERE id_miembro = ?");
-    $stmt->bind_param("ii", $socio, $id_miembro_socio);
-    $stmt->execute();
+
+    // Consulta actual para revisar el estado actual
+    $consulta = $conexion->prepare("SELECT es_miembro FROM miembro WHERE id_miembro = ?");
+    $consulta->bind_param("i", $id_miembro_socio);
+    $consulta->execute();
+    $resultado = $consulta->get_result()->fetch_assoc();
+    $consulta->close();
+
+    if ($resultado) {
+        $estado_actual = (int)$resultado["es_miembro"];
+
+        if ($socio === 1 && $estado_actual === 0) {
+            // Se hace miembro por primera vez -> registrar fecha actual
+            $stmt = $conexion->prepare("UPDATE miembro SET es_miembro = 1, fecha_ingreso = CURDATE() WHERE id_miembro = ?");
+        } elseif ($socio === 0 && $estado_actual === 1) {
+            // Se deja de ser miembro -> limpiar fecha
+            $stmt = $conexion->prepare("UPDATE miembro SET es_miembro = 0, fecha_ingreso = NULL WHERE id_miembro = ?");
+        } else {
+            // No hay cambio real, salimos
+            header("Location: admin.php?view=miembros");
+            exit;
+        }
+
+        if ($stmt) {
+            $stmt->bind_param("i", $id_miembro_socio);
+            $stmt->execute();
+            $stmt->close();
+        }
+    }
 
     header("Location: admin.php?view=miembros");
     exit;
 }
-
 // Cambiar estado de administrador
 if ($view === 'miembros' && isset($_GET["admin"]) && isset($_GET["id"])) {
     $id_miembro_admin = intval($_GET["id"]);
@@ -910,6 +934,21 @@ $miembros_lista = $conexion->query("SELECT id_miembro, nombre FROM miembro ORDER
                 <?php endwhile; endif; ?>
             </table>
             <?php break; case 'postulaciones': ?>
+<?php
+    if ($view === 'postulaciones' && isset($_GET["estado"]) && isset($_GET["id_postulacion"])) {
+    $nuevo_estado = $_GET["estado"];
+    $id_postulacion = intval($_GET["id_postulacion"]);
+
+    if (in_array($nuevo_estado, ['pendiente', 'aceptada'])) {
+        $stmt = $conexion->prepare("UPDATE postulacion SET estado_po = ? WHERE id_postulacion = ?");
+        $stmt->bind_param("si", $nuevo_estado, $id_postulacion);
+        $stmt->execute();
+    }
+
+    echo "<script>window.location.href='admin.php?view=postulaciones';</script>";
+    exit;
+}
+?>
             <h2>Listado de Postulaciones</h2>
 
     <?php
@@ -948,55 +987,70 @@ if (isset($datos_vista['postulaciones']) && $datos_vista['postulaciones']->num_r
             <?php if (count($postulaciones_filtradas) > 0): ?>
             <div style="overflow-x: auto;">
                <table style="width: 100%;">
-                    <tr>
-                    <th>ID</th>
-                    <th>Miembro</th>
-                    <th>Cant. menores</th>
-                    <th>Trabajo</th>
-                    <th>Tipo contrato</th>
-                    <th>Ingresos nominales</th>
-                    <th>Ingresos familiares</th>
-                    <th>Observación salud</th>
-                    <th>Constitución familiar</th>
-                    <th>Vivienda actual</th>
-                    <th>Gasto vivienda</th>
-                    <th>Nivel educativo</th>
-                    <th>Hijos estudiando</th>
-                    <th>Patrimonio</th>
-                    <th>Disp. ayuda</th>
-                    <th>Motivación</th>
-                    <th>Presentado por</th>
-                    <th>Referencia</th>
-                    <th>Estado</th>
-                    <th>Comentario admin</th>
-                    <th>Fecha</th>
-                </tr>
-                <?php foreach($postulaciones_filtradas as $postulacion): ?>
-                <tr>
-                    <td><?= htmlspecialchars($postulacion["id_postulacion"]) ?></td>
-                    <td><?= htmlspecialchars($postulacion["nombre_miembro"] ?? $postulacion["email_miembro"] ?? "Desconocido") ?></td>
-                    <td><?= htmlspecialchars($postulacion["cantidad_menores"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["trabajo"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["tipo_contrato"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["ingresos_nominales"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["ingresos_familiares"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["observacion_salud"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["constitucion_familiar"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["vivienda_actual"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["gasto_vivienda"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["nivel_educativo"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["hijos_estudiando"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["patrimonio"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["disponibilidad_ayuda"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["motivacion"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["presentado_por"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["referencia_contacto"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["estado_po"] ?? "pendiente") ?></td>
-                    <td><?= htmlspecialchars($postulacion["comentarios_admin"] ?? "") ?></td>
-                    <td><?= htmlspecialchars($postulacion["fecha_postulacion"] ?? "") ?></td>
-                </tr>
-                <?php endforeach; ?>
-            </table>
+    <tr>
+        <th>ID</th>
+        <th>Miembro</th>
+        <th>Cant. menores</th>
+        <th>Trabajo</th>
+        <th>Tipo contrato</th>
+        <th>Ingresos nominales</th>
+        <th>Ingresos familiares</th>
+        <th>Observación salud</th>
+        <th>Constitución familiar</th>
+        <th>Vivienda actual</th>
+        <th>Gasto vivienda</th>
+        <th>Nivel educativo</th>
+        <th>Hijos estudiando</th>
+        <th>Patrimonio</th>
+        <th>Disp. ayuda</th>
+        <th>Motivación</th>
+        <th>Presentado por</th>
+        <th>Referencia</th>
+        <th>Estado</th>
+        <th>Comentario admin</th>
+        <th>Fecha</th>
+        <th>Acciones</th> <!-- 🔹 nueva columna -->
+    </tr>
+
+    <?php foreach($postulaciones_filtradas as $postulacion): ?>
+    <tr>
+        <td><?= htmlspecialchars($postulacion["id_postulacion"]) ?></td>
+        <td><?= htmlspecialchars($postulacion["nombre_miembro"] ?? $postulacion["email_miembro"] ?? "Desconocido") ?></td>
+        <td><?= htmlspecialchars($postulacion["cantidad_menores"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["trabajo"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["tipo_contrato"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["ingresos_nominales"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["ingresos_familiares"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["observacion_salud"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["constitucion_familiar"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["vivienda_actual"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["gasto_vivienda"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["nivel_educativo"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["hijos_estudiando"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["patrimonio"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["disponibilidad_ayuda"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["motivacion"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["presentado_por"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["referencia_contacto"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["estado_po"] ?? "pendiente") ?></td>
+        <td><?= htmlspecialchars($postulacion["comentarios_admin"] ?? "") ?></td>
+        <td><?= htmlspecialchars($postulacion["fecha_postulacion"] ?? "") ?></td>
+        <td>
+            <?php if ($postulacion["estado_po"] === 'pendiente'): ?>
+                <a href="admin.php?view=postulaciones&id_postulacion=<?= $postulacion["id_postulacion"] ?>&estado=aceptada" 
+                   style="background-color:#28a745; color:#fff; padding:5px 8px; border-radius:6px; text-decoration:none;">
+                   Aceptar
+                </a>
+            <?php else: ?>
+                <a href="admin.php?view=postulaciones&id_postulacion=<?= $postulacion["id_postulacion"] ?>&estado=pendiente" 
+                   style="background-color:#dc3545; color:#fff; padding:5px 8px; border-radius:6px; text-decoration:none;">
+                   Revertir
+                </a>
+            <?php endif; ?>
+        </td>
+    </tr>
+    <?php endforeach; ?>
+</table>
             </div>
 
             <?php else: ?>

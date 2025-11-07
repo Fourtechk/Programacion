@@ -26,7 +26,7 @@ $sql = "
         m.email, 
         m.id_unidad, 
         m.fecha_nacimiento,
-        m.fecha_ingreso AS fecha_socio,
+        m.fecha_ingreso,
         m.foto_perfil AS foto_perfil_url
     FROM 
         miembro m
@@ -952,8 +952,8 @@ a:hover {
 
             <p style="margin-bottom: 0;">
                 <strong style="color: #6ebbe9;">Socio Desde:</strong>
-                <?php if (!empty($user['fecha_socio'])): ?>
-                    <span style="float: right; color: #fff;"><?= htmlspecialchars(date('d/m/Y', strtotime($user['fecha_socio']))) ?></span>
+                <?php if (!empty($user['fecha_ingreso'])): ?>
+                    <span style="float: right; color: #fff;"><?= htmlspecialchars(date('d/m/Y', strtotime($user['fecha_ingreso']))) ?></span>
                 <?php else: ?>
                     <em style="color: #888; float: right;">Dato no disponible</em>
                 <?php endif; ?>
@@ -1047,7 +1047,6 @@ a:hover {
                         <div>
                             <label>Justificativo (si no asistió):</label>
                             <textarea name="justificativo_texto"></textarea>
-                            <input type="file" name="justificativo_file" accept=".pdf,.jpg,.jpeg,.png">
                         </div>
 
                         <button type="submit" name="guardar_asistencia" class="postularme">Guardar</button>
