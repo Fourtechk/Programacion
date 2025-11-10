@@ -1026,7 +1026,6 @@ if (isset($datos_vista['postulaciones']) && $datos_vista['postulaciones']->num_r
         <th>Presentado por</th>
         <th>Referencia</th>
         <th>Estado</th>
-        <th>Comentario admin</th>
         <th>Fecha</th>
         <th>Acciones</th> <!-- 🔹 nueva columna -->
     </tr>
@@ -1052,7 +1051,6 @@ if (isset($datos_vista['postulaciones']) && $datos_vista['postulaciones']->num_r
         <td><?= htmlspecialchars($postulacion["presentado_por"] ?? "") ?></td>
         <td><?= htmlspecialchars($postulacion["referencia_contacto"] ?? "") ?></td>
         <td><?= htmlspecialchars($postulacion["estado_po"] ?? "pendiente") ?></td>
-        <td><?= htmlspecialchars($postulacion["comentarios_admin"] ?? "") ?></td>
         <td><?= htmlspecialchars($postulacion["fecha_postulacion"] ?? "") ?></td>
         <td>
             <?php if ($postulacion["estado_po"] === 'pendiente'): ?>
