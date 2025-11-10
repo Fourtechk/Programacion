@@ -21,20 +21,15 @@ if (!$monto || !$concepto || !isset($_FILES['archivo'])) {
 // Validar archivo
 $archivo = $_FILES['archivo'];
 $ext = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-
-// 1. RESTRICCIÓN DE FORMATOS: Solo JPG/JPEG/PNG
-$permitidos = ['jpg','jpeg','png'];
+$permitidos = ['jpg','jpeg','png','pdf'];
 
 if (!in_array($ext, $permitidos)) {
-    header("Location: pagos.php?err=Formato no permitido. Solo se aceptan JPG, JPEG y PNG.");
+    header("Location: pagos.php?err=Formato no permitido");
     exit;
 }
 
-// 2. RESTRICCIÓN DE TAMAÑO: Máximo 2 MB
-$max_size = 2 * 1024 * 1024; // 2 MB en bytes
-
-if ($archivo['size'] > $max_size) { 
-    header("Location: pagos.php?err=Archivo demasiado grande. El máximo es 2MB.");
+if ($archivo['size'] > 5 * 1024 * 1024) { // 5 MB
+    header("Location: pagos.php?err=Archivo demasiado grande");
     exit;
 }
 

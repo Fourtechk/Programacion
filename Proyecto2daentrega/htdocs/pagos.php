@@ -1452,38 +1452,6 @@ document.addEventListener('DOMContentLoaded', () => {
     history.replaceState(null, '', '#seccion-calendario');
   }
 });
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Referencia al formulario que sube el comprobante
-    const form = document.querySelector('form[action="subir_comprobante.php"]');
-    // Referencia al campo de archivo
-    const archivoInput = document.querySelector('input[name="archivo"]');
-
-    if (form && archivoInput) {
-        form.addEventListener('submit', function(e) {
-            
-            // Si el campo está vacío, permite que el 'required' del HTML actúe
-            if (archivoInput.files.length === 0) {
-                return; 
-            }
-            
-            const archivo = archivoInput.files[0];
-            const nombreArchivo = archivo.name;
-            // Extrae la extensión y la convierte a minúsculas
-            const extension = nombreArchivo.substring(nombreArchivo.lastIndexOf('.') + 1).toLowerCase();
-            
-            // Verifica si la extensión es PDF
-            if (extension === 'pdf') {
-                e.preventDefault(); // <-- ¡DETIENE EL ENVÍO DEL FORMULARIO!
-                alert(' Formato no permitido. Por favor, sube solo imágenes (JPG, JPEG, PNG).');
-                archivoInput.value = ''; // Limpia el campo de archivo
-                return;
-            }
-        });
-    }
-});
-
-
 </script>
 </body>
 </html>
