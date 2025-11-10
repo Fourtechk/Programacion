@@ -7,30 +7,60 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - db
+      - db_master
     networks:
       - appnet
 
-  db:
+  db_master:
     image: mysql:8.0
-    container_name: sistema_backup
+    container_name: sistema_db
     restart: always
     env_file: .env
     environment:
       MYSQL_ROOT_HOST: "192.168.1.50"
+    command: [
+      "--server-id=1",
+      "--log-bin=mysql-bin",
+      "--binlog-format=ROW",
+      "--gtid-mode=ON",
+      "--enforce-gtid-consistency=ON"
+    ]  
     volumes:
-      - ./db:/docker-entrypoint-initdb.d
-      - db_data:/var/lib/mysql
+      - ./sql:/docker-entrypoint-initdb.d
+      - master_data:/var/lib/mysql
     networks:
       - appnet
-  
+
+
+  db_slave:
+    image: mysql:8.0
+    container_name: sistema_dbslave
+    restart: always
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: "192.168.1.50"
+    command: [
+      "--server-id=2",
+      "--relay-log=mysql-relay-bin",
+      "--log-bin=mysql-bin",
+      "--binlog-format=ROW",
+      "--gtid-mode=ON",
+      "--enforce-gtid-consistency=ON"
+    ]
+    volumes:
+      - ./slave_data:/var/lib/mysql
+    depends_on:
+      - db_master
+    networks:
+      - appnet
+
   backup:
     build: ./backup
     container_name: sistema_backup
     volumes:
-      - ./backups:/backups
+      - ./backup:/backups
     depends_on:
-      - db 
+      - db_master 
     networks:
       - appnet
 
