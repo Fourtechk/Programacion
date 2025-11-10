@@ -21,15 +21,20 @@ if (!$monto || !$concepto || !isset($_FILES['archivo'])) {
 // Validar archivo
 $archivo = $_FILES['archivo'];
 $ext = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-$permitidos = ['jpg','jpeg','png','pdf'];
+
+// 1. RESTRICCIÓN DE FORMATOS: Solo JPG/JPEG/PNG
+$permitidos = ['jpg','jpeg','png'];
 
 if (!in_array($ext, $permitidos)) {
-    header("Location: pagos.php?err=Formato no permitido");
+    header("Location: pagos.php?err=Formato no permitido. Solo se aceptan JPG, JPEG y PNG.");
     exit;
 }
 
-if ($archivo['size'] > 5 * 1024 * 1024) { // 5 MB
-    header("Location: pagos.php?err=Archivo demasiado grande");
+// 2. RESTRICCIÓN DE TAMAÑO: Máximo 2 MB
+$max_size = 2 * 1024 * 1024; // 2 MB en bytes
+
+if ($archivo['size'] > $max_size) { 
+    header("Location: pagos.php?err=Archivo demasiado grande. El máximo es 2MB.");
     exit;
 }
 
@@ -42,6 +47,19 @@ $nombre_archivo = $carpeta . time() . "_" . basename($archivo['name']);
 if (!move_uploaded_file($archivo['tmp_name'], $nombre_archivo)) {
     header("Location: pagos.php?err=Error al subir el archivo");
     exit;
+}
+
+if (isset($_POST["monto"])) {
+    $monto = floatval($_POST["monto"]);
+
+    if ($monto < 0) {
+        // Manejar el error, por ejemplo, establecer el monto a 0 o abortar la operación.
+        $monto = 0; 
+        // O: die("Error: El monto no puede ser negativo.");
+    }
+    
+    // Continuar con la inserción en la base de datos usando $monto
+    // ...
 }
 
 // Insertar registro en BD

@@ -102,6 +102,12 @@ $stmt->close();
   <style>
  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap'); 
 
+ form select option {
+    /* Usamos un color oscuro que contraste con el texto blanco */
+    background-color: #1a2433; /* El mismo color del fondo principal/header */
+    color: #fff;
+}
+
    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
 
     body { background: linear-gradient(135deg, #1a2433 0%, #2b5f87 100%);
@@ -230,66 +236,68 @@ $stmt->close();
   <div class="form-box"> 
     <form method="POST"> 
       <label>Nombre Completo</label>
-       <input type="text" name="nombre"> 
+<input type="text" name="nombre" maxlength="150" required> 
 
-       <label>Email</label>
-        <input type="email" name="email"> 
+<label>Email</label>
+<input type="email" name="email" minlength="11" maxlength="100" required> 
 
-       <label>Contraseña</label> 
-       <input type="password" name="password"> 
+<label>Contraseña</label> 
+<input type="password" name="password" minlength="4" maxlength="255" required> 
 
-       <label for="fecha_nacimiento">Fecha de nacimiento:</label>
-       <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+<label for="fecha_nacimiento">Fecha de nacimiento:</label>
+<input type="date" id="fecha_nacimiento" name="fecha_nacimiento" max="<?php echo date('Y-m-d'); ?>" required>
 
-       <label>Cantidad de menores a cargo:</label> 
-       <input type="number" name="cantidad_menores" required>
+<label>Cantidad de menores a cargo:</label> 
+<input type="number" name="cantidad_menores" min="0" max="20" required>
 
-        <label>Trabajo actual:</label> 
-        <input type="text" name="trabajo" required> 
+<label>Trabajo actual:</label> 
+<input type="text" name="trabajo" maxlength="150" required> 
 
-        <label>Tipo de contrato:</label> 
-        <select name="tipo_contrato" required> 
-        <option value="permanente">Permanente</option> <option value="eventual">Eventual</option> 
-        <option value="informal">Informal</option> </select>
+<label>Tipo de contrato:</label> 
+<select name="tipo_contrato" required> 
+  <option value="">Seleccione una opción</option> 
+  <option value="permanente">Permanente</option> <option value="eventual">Eventual</option> 
+  <option value="informal">Informal</option> 
+</select>
 
-        <label>Ingresos nominales (personales):</label>
-        <input type="number" step="0.01" name="ingresos_nominales" required>
+<label>Ingresos nominales (personales):</label>
+<input type="number" step="0.01" name="ingresos_nominales" min="0" max="1000000" required>
 
-        <label>Ingresos familiares totales:</label> 
-        <input type="number" step="0.01" name="ingresos_familiares"> 
+<label>Ingresos familiares totales:</label> 
+<input type="number" step="0.01" name="ingresos_familiares" min="0" max="5000000"> 
 
-        <label>Observación de salud:</label> 
-        <textarea name="observacion_salud"></textarea> 
+<label>Observación de salud:</label> 
+<textarea name="observacion_salud" maxlength="500"></textarea> 
 
-        <label>Constitución del núcleo familiar:</label> 
-        <textarea name="constitucion_familiar" required></textarea> 
+<label>Constitución del núcleo familiar:</label> 
+<textarea name="constitucion_familiar" minlength="1" maxlength="500" required></textarea> 
 
-        <label>Vivienda actual:</label> 
-        <input type="text" name="vivienda_actual">
+<label>Vivienda actual:</label> 
+<input type="text" name="vivienda_actual" minlength="1" maxlength="500">
 
-        <label>Gasto mensual de vivienda:</label> 
-        <input type="number" step="0.01" name="gasto_vivienda"> 
+<label>Gasto mensual de vivienda:</label> 
+<input type="number" step="0.01" name="gasto_vivienda" min="0" max="500000"> 
 
-        <label>Nivel educativo alcanzado:</label> 
-        <input type="text" name="nivel_educativo"> 
+<label>Nivel educativo alcanzado:</label> 
+<input type="text" name="nivel_educativo" maxlength="500"> 
 
-        <label>Hijos estudiando (cantidad):</label>
-        <input type="number" name="hijos_estudiando">
+<label>Hijos estudiando (cantidad):</label>
+<input type="number" name="hijos_estudiando" min="0" max="10">
 
-        <label>Patrimonio (terreno, casa, vehículo, etc.):</label> 
-        <textarea name="patrimonio"></textarea> 
+<label>Patrimonio (terreno, casa, vehículo, etc.):</label> 
+<textarea name="patrimonio" maxlength="500"></textarea> 
 
-        <label>Disponibilidad para ayuda mutua:</label> 
-        <textarea name="disponibilidad_ayuda"></textarea> 
+<label>Disponibilidad para ayuda mutua:</label> 
+<textarea name="disponibilidad_ayuda" maxlength="500"></textarea> 
 
-        <label>Motivación para ingresar a la cooperativa:</label> 
-        <textarea name="motivacion"></textarea>
+<label>Motivación para ingresar a la cooperativa:</label> 
+<textarea name="motivacion" maxlength="500"></textarea>
 
-        <label>Presentado por:</label> 
-        <input type="text" name="presentado_por"> 
+<label>Presentado por:</label> 
+<input type="text" name="presentado_por" maxlength="500"> 
 
-        <label>Referencia personal (nombre y teléfono):</label> 
-        <input type="text" name="referencia_contacto">
+<label>Referencia personal (nombre y teléfono):</label> 
+<input type="text" name="referencia_contacto" maxlength="500">
                 
         <button type="submit" class="postularme">Enviar Postulación</button> </form>
                <a href="index.html">Volver</a>
@@ -336,6 +344,238 @@ $stmt->close();
 </style>
 <?php endif; ?>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const form = document.querySelector("form");
+
+  form.addEventListener("submit", function(e) {
+    const campos = form.querySelectorAll("input, textarea, select");
+    for (let campo of campos) {
+      if (campo.hasAttribute("required") && campo.value.trim() === "") {
+        alert("El campo '" + (campo.previousElementSibling?.innerText || campo.name) + "' no puede quedar vacío.");
+        campo.focus();
+        e.preventDefault();
+        return;
+      }
+    }
+
+    const nombre = document.querySelector('input[name="nombre"]').value.trim();
+    const email = document.querySelector('input[name="email"]').value.trim();
+    const password = document.querySelector('input[name="password"]').value.trim();
+    const menores = document.querySelector('input[name="cantidad_menores"]').value.trim();
+    const trabajo = document.querySelector('input[name="trabajo"]').value.trim();
+    const tipoContrato = document.querySelector('select[name="tipo_contrato"]').value.trim();
+    const ingresosNom = document.querySelector('input[name="ingresos_nominales"]').value.trim();
+    const ingresosFam = document.querySelector('input[name="ingresos_familiares"]').value.trim();
+    const observacion = document.querySelector('textarea[name="observacion_salud"]').value.trim();
+    const constitucion = document.querySelector('textarea[name="constitucion_familiar"]').value.trim();
+    const vivienda = document.querySelector('input[name="vivienda_actual"]').value.trim();
+    const gasto = document.querySelector('input[name="gasto_vivienda"]').value.trim();
+    const nivelEduc = document.querySelector('input[name="nivel_educativo"]').value.trim();
+    const hijosEst = document.querySelector('input[name="hijos_estudiando"]').value.trim();
+    const patrimonio = document.querySelector('textarea[name="patrimonio"]').value.trim();
+    const ayuda = document.querySelector('textarea[name="disponibilidad_ayuda"]').value.trim();
+    const motivacion = document.querySelector('textarea[name="motivacion"]').value.trim();
+    const presentado = document.querySelector('input[name="presentado_por"]').value.trim();
+    const referencia = document.querySelector('input[name="referencia_contacto"]').value.trim();
+
+    const letras = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+    const numeros = /^\d+$/;
+    const decimal = /^\d+(\.\d{1,2})?$/;
+    const emailValido = /^[^@\s]+@(gmail.com|hotmail.com)$/i;
+    const passValido = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+
+    // --- VALIDACIONES DE DOMINIO (LÍMITES) ---
+    
+// Nombre Completo (Min. 1, Máx. 150)
+if (nombre.length < 1 || nombre.length > 150) {
+    alert("El nombre debe tener entre 1 y 150 caracteres.");
+    e.preventDefault();
+    return;
+}
+if (!letras.test(nombre)) {
+  alert("El nombre solo puede contener letras y espacios.");
+  e.preventDefault();
+  return;
+}
+
+// Email (Min. 11, Máx. 100)
+if (email.length < 11 || email.length > 100) {
+    alert("El email debe tener entre 11 y 100 caracteres.");
+    e.preventDefault();
+    return;
+}
+if (!emailValido.test(email)) {
+  alert("El dominio de email no es válido. Debe ser @gmail.com o @hotmail.com.");
+  e.preventDefault();
+  return;
+}
+
+// Contraseña (Min. 4, Máx. 255)
+if (password.length < 4 || password.length > 255) {
+    alert("La contraseña debe tener entre 4 y 255 caracteres.");
+    e.preventDefault();
+    return;
+}
+// MANTENER la validación de passValido si quieres que sea alfanumérica y mín. 6:
+/*
+if (!passValido.test(password)) {
+  alert("La contraseña debe tener al menos 6 caracteres con letras y números.");
+  e.preventDefault();
+  return;
+}
+*/
+
+// Cantidad de menores (Min. 0, Máx. 20)
+if (!numeros.test(menores) || parseInt(menores) < 0 || parseInt(menores) > 20) {
+  alert("La cantidad de menores debe ser un número entero positivo entre 0 y 20.");
+  e.preventDefault();
+  return;
+}
+
+// Trabajo actual (Min. 1, Máx. 150)
+if (trabajo.length < 1 || trabajo.length > 150) {
+    alert("El campo 'Trabajo actual' debe tener entre 1 y 150 caracteres.");
+    e.preventDefault();
+    return;
+}
+
+// Ingresos nominales (Max. $1,000,000)
+if (!decimal.test(ingresosNom) || parseFloat(ingresosNom) > 1000000) {
+  alert("El ingreso nominal debe ser un número válido (máx. 2 decimales) y no exceder $1,000,000.");
+  e.preventDefault();
+  return;
+}
+
+// Ingresos familiares (Max. $5,000,000)
+if (ingresosFam !== "" && (!decimal.test(ingresosFam) || parseFloat(ingresosFam) > 5000000)) {
+  alert("El ingreso familiar debe ser un número válido (máx. 2 decimales) y no exceder $5,000,000.");
+  e.preventDefault();
+  return;
+}
+
+// Constitución Familiar (Min. 1, Máx. 500)
+if (constitucion.length < 1 || constitucion.length > 500) {
+    alert("La 'Constitución del núcleo familiar' debe tener entre 1 y 500 caracteres.");
+    e.preventDefault();
+    return;
+}
+
+// Vivienda actual (Min. 1, Máx. 500)
+if (vivienda.length < 1 || vivienda.length > 500) {
+    alert("El campo 'Vivienda actual' debe tener entre 1 y 500 caracteres.");
+    e.preventDefault();
+    return;
+}
+
+// Gasto vivienda (Max. $500,000)
+if (gasto !== "" && (!decimal.test(gasto) || parseFloat(gasto) > 500000)) {
+    alert("El gasto de vivienda debe ser un número válido (máx. 2 decimales) y no exceder $500,000.");
+    e.preventDefault();
+    return;
+}
+
+// Hijos estudiando (Min. 0, Máx. 10)
+if (hijosEst !== "" && (!numeros.test(hijosEst) || parseInt(hijosEst) < 0 || parseInt(hijosEst) > 10)) {
+    alert("El campo 'Hijos estudiando' debe ser un número entero entre 0 y 10.");
+    e.preventDefault();
+    return;
+}
+
+// Validación de Máx. 500 para Textareas/Text (los demás campos de texto libre)
+if (observacion.length > 500 || nivelEduc.length > 500 || patrimonio.length > 500 || ayuda.length > 500 || motivacion.length > 500 || presentado.length > 500 || referencia.length > 500) {
+    alert("Uno o más campos de texto libre exceden el límite de 500 caracteres.");
+    e.preventDefault();
+    return;
+}
+
+// MANTENER estas validaciones de tipo de texto (si quieres limitar a solo letras)
+if (!letras.test(nivelEduc) && nivelEduc !== "") {
+    alert("El campo 'Nivel educativo' solo debe contener letras.");
+    e.preventDefault();
+    return;
+}
+
+if (!letras.test(presentado) && presentado !== "") {
+    alert("El campo 'Presentado por' solo puede contener letras.");
+    e.preventDefault();
+    return;
+}
+
+if (referencia !== "" && !/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s0-9\-\+]+$/.test(referencia)) {
+    alert("El campo 'Referencia personal' solo puede contener letras, números y signos + o -.");
+    e.preventDefault();
+    return;
+}
+
+    if (!letras.test(nombre)) {
+      alert("El nombre solo puede contener letras y espacios.");
+      e.preventDefault();
+      return;
+    }
+
+   
+   
+
+    if (!numeros.test(menores)) {
+      alert("La cantidad de menores debe ser un número entero positivo.");
+      e.preventDefault();
+      return;
+    }
+
+    if (!letras.test(trabajo)) {
+      alert("El campo 'Trabajo actual' solo debe contener letras.");
+      e.preventDefault();
+      return;
+    }
+
+    if (!decimal.test(ingresosNom)) {
+      alert("El ingreso nominal debe ser un número válido (máx. 2 decimales).");
+      e.preventDefault();
+      return;
+    }
+
+    if (ingresosFam !== "" && !decimal.test(ingresosFam)) {
+      alert("El ingreso familiar debe ser un número válido (máx. 2 decimales).");
+      e.preventDefault();
+      return;
+    }
+
+    if (!letras.test(nivelEduc)) {
+      alert("El campo 'Nivel educativo' solo debe contener letras.");
+      e.preventDefault();
+      return;
+    }
+
+    if (hijosEst !== "" && !numeros.test(hijosEst)) {
+      alert("El campo 'Hijos estudiando' debe ser numérico.");
+      e.preventDefault();
+      return;
+    }
+
+    if (!letras.test(presentado) && presentado !== "") {
+      alert("El campo 'Presentado por' solo puede contener letras.");
+      e.preventDefault();
+      return;
+    }
+
+    if (referencia !== "" && !/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s0-9\-\+]+$/.test(referencia)) {
+      alert("El campo 'Referencia personal' solo puede contener letras, números y signos + o -.");
+      e.preventDefault();
+      return;
+    }
+  });
+
+  // 🔸 Restricciones en tiempo real
+  document.querySelectorAll('input[name="nombre"], input[name="trabajo"], input[name="nivel_educativo"], input[name="presentado_por"]').forEach(campo => {
+    campo.addEventListener("input", e => e.target.value = e.target.value.replace(/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, ""));
+  });
+  document.querySelectorAll('input[type="number"]').forEach(campo => {
+    campo.addEventListener("input", e => e.target.value = e.target.value.replace(/[^0-9.]/g, ""));
+  });
+});
+</script>
 
 </body> 
 </html>

@@ -91,7 +91,7 @@ if ($view === 'comprobantes' && $_SERVER["REQUEST_METHOD"] === "POST" && isset($
 if ($view === 'horas' && $_SERVER["REQUEST_METHOD"] === "POST") {
     $id_miembro = isset($_POST["id_miembro"]) ? intval($_POST["id_miembro"]) : 0;
 
-    if ($id_miembro > 0) {
+  if ($id_miembro > 0) {
         // Verificar/crear fila en tabla 'horas' si no existe
         $check = $conexion->prepare("SELECT id_horas FROM horas WHERE id_miembro = ?");
         $check->bind_param("i", $id_miembro);
@@ -137,7 +137,16 @@ if ($view === 'horas' && $_SERVER["REQUEST_METHOD"] === "POST") {
             $update->bind_param("i", $id_miembro);
             $update->execute();
             $msg = "Horas pendientes aprobadas";
-        }
+        
+        } elseif (isset($_POST["rechazar_pendientes"])) { 
+            // NUEVA LÓGICA: Rechazar Horas Pendientes (establecerlas a 0)
+            
+            $update = $conexion->prepare("UPDATE horas SET horas_pendientes = 0 WHERE id_miembro = ?");
+            $update->bind_param("i", $id_miembro);
+            $update->execute();
+            $msg = "Horas pendientes rechazadas (establecidas a 0)";
+            
+        } // Fin del nuevo elseif
     }
     // Redirección POST/REDIRECT/GET
     header("Location: admin.php?view=horas&msg_horas=" . urlencode("✅ " . ($msg ?? "Acción realizada") . " para el miembro #" . ($id_miembro ?? '')));
@@ -920,13 +929,23 @@ $miembros_lista = $conexion->query("SELECT id_miembro, nombre FROM miembro ORDER
                               ?>
                             </div>
                             </td>
-                            <td>
-
+                           <td>
                             <input type="hidden" name="id_miembro" value="<?= $u['id_miembro'] ?>">
+                            
                             <button type="submit" name="guardar" class="azul">Guardar</button>
                             
                             <?php if ((int)($u['horas_pendientes'] ?? 0) > 0): ?>
                                 <button type="submit" name="aprobar_pendientes" class="aprobar">Aprobar Pendientes</button>
+                                
+                                <button 
+                                    type="submit" 
+                                    name="rechazar_pendientes" 
+                                    class="rechazar" 
+                                    style="background-color: #dc3545; color: white; border: none; padding: 6px 12px; margin-top: 5px; cursor: pointer;"
+                                    onclick="return confirm('¿Confirmas el RECHAZO? Esto pondrá las horas pendientes a 0.');"
+                                >
+                                     Rechazar Pendientes
+                                </button>
                             <?php endif; ?>
                         </td>
                     </tr>
